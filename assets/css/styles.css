@@ -332,8 +332,11 @@ img, svg { max-width: 100%; }
 
 /* Responsive --------------------------------------------------------------- */
 @media (max-width: 720px) {
-  .nav__toggle { display: inline-grid; place-items: center; }
-  .nav__menu {
+  .nav__menu a { display: block; padding: 0.75rem 0.5rem; }
+
+  /* Enhanced (JS) experience: collapsible menu behind the toggle button. */
+  .js .nav__toggle { display: inline-grid; place-items: center; }
+  .js .nav__menu {
     position: absolute;
     left: 0; right: 0; top: 100%;
     flex-direction: column;
@@ -343,8 +346,18 @@ img, svg { max-width: 100%; }
     padding: 0.5rem var(--space) 1rem;
     display: none;
   }
-  .nav__menu.is-open { display: flex; }
-  .nav__menu a { display: block; padding: 0.75rem 0.5rem; }
+  .js .nav__menu.is-open { display: flex; }
+
+  /* No-JS fallback: hide the (non-functional) toggle and keep the nav visible
+     and keyboard-reachable, stacked in normal flow. */
+  .no-js .nav__toggle { display: none; }
+  .no-js .nav__menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    padding-top: 0.5rem;
+  }
 }
 
 /* Motion preferences ------------------------------------------------------- */
