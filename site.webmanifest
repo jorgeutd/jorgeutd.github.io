@@ -1,0 +1,13 @@
+{
+  "name": "Jorge Grisman — Principal AI Engineer",
+  "short_name": "Jorge Grisman",
+  "description": "Principal AI Engineer focused on AI agents and LLM inference.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0f1a",
+  "theme_color": "#0b0f1a",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "/favicon.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
