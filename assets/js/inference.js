@@ -191,6 +191,9 @@
     var form = document.getElementById("calc-form");
     if (!form) return;
     var P = {
+      // [num_layers, num_kv_heads, head_dim] — verified from model cards / configs
+      "qwen3-8b": [36, 8, 128], "qwen3-32b": [64, 8, 128], "qwen3-235b": [94, 4, 128],
+      "gptoss-20b": [24, 8, 64],
       "l31-8b": [32, 8, 128], "l31-70b": [80, 8, 128], "qwen25-7b": [28, 4, 128],
       "mistral-7b": [32, 8, 128], "l2-13b": [40, 40, 128]
     };

@@ -85,7 +85,7 @@
         <canvas class="hero-net" data-net></canvas>
       </div>
       <div class="container hero__inner">
-        <p class="hero__eyebrow">Production AI &middot; Agents &middot; On-device &amp; Cloud Inference</p>
+        <p class="hero__eyebrow">Turning ambiguous AI problems into production systems</p>
         <h1 id="hero-title" class="hero__title">Jorge Grisman</h1>
         <p class="hero__role">Principal AI Engineer — <span class="accent">AI Agents &amp; LLM Inference</span></p>
         <p class="hero__lede">
@@ -236,6 +236,16 @@
               <li>AWS Bedrock</li><li>Azure OpenAI / AI Foundry</li><li>Google Vertex AI (Gemini)</li>
             </ul>
           </div>
+          <div class="skill-group">
+            <h3 class="skill-group__title">Systems &amp; architecture</h3>
+            <ul class="chips" role="list">
+              <li>Distributed &amp; event-driven systems</li><li>Kafka</li><li>Microservices</li>
+              <li>REST / gRPC APIs</li><li>MCP server design</li><li>RAG architecture</li>
+              <li>AI observability (MLflow, tracing)</li><li>Release governance</li>
+              <li>CI/CD (GitHub Actions)</li><li>Docker</li><li>Terraform</li>
+              <li>AWS (ECS/Fargate, Lambda, S3)</li>
+            </ul>
+          </div>
         </div>
       </div>
     </section>
@@ -246,27 +256,37 @@
         <h2 class="section__title" id="experience-title">Career highlights</h2>
         <ol class="timeline" role="list">
           <li class="timeline__item">
-            <h3 class="timeline__role">Staff AI Engineer II — AI Agents</h3>
+            <h3 class="timeline__role">Staff AI Engineer</h3>
             <p class="timeline__org">Grainger</p>
             <p class="timeline__desc">
-              On-device LLM/STT inference on Apple Silicon with llama.cpp and whisper.cpp; multi-agent
-              swarm architectures with LangGraph, Azure OpenAI, and Kafka; MCP servers over real
-              business systems; AI observability and release governance.
+              Shipped an offline-first, on-device LLM/STT pipeline (quantized GGUF + Whisper via
+              llama.cpp / whisper.cpp on Apple Silicon, GBNF-constrained outputs) for an iOS sales app
+              used by 3,000+ sellers. Built a multi-agent email-automation swarm (LangGraph, Azure
+              OpenAI, FastAPI, Kafka) processing 48,000+ daily emails and cut manual handling ~85%.
+              Stood up the AI release &amp; observability control plane (immutable artifacts,
+              checksum-governed promotion, MLflow tracing, LLM-as-judge evals), taking releases from
+              weeks to days.
             </p>
           </li>
           <li class="timeline__item">
             <h3 class="timeline__role">Principal Machine Learning Engineer</h3>
             <p class="timeline__org">GEICO</p>
             <p class="timeline__desc">
-              LLM-powered virtual assistant; fine-tuned Llama 3.1 for function calling; DeBERTa intent
-              recognition; FastMCP 2.0 tooling for safe agent operation.
+              Tech lead for the GEICO Virtual Assistant across voice (IVR) and chat &mdash; a multi-agent
+              workflow (LangGraph, Azure OpenAI, fine-tuned Llama 3.1 for function calling) over policy,
+              billing, and claims systems. Cut live-agent transfers 14.7% in two months, fine-tuned a
+              DeBERTa v3 intent engine (400+ intents, 95.7% F1), and built 15+ enterprise MCP tools on
+              FastMCP 2.0.
             </p>
           </li>
           <li class="timeline__item">
             <h3 class="timeline__role">Lead Data Scientist</h3>
             <p class="timeline__org">Quantum Health</p>
             <p class="timeline__desc">
-              Agentic workflows on AWS Bedrock, applied to healthcare navigation and operations.
+              Built an agentic email-triage workflow (LangGraph, LangChain, AWS Bedrock) that took
+              response times from days to real-time and lifted service levels 17%, plus a RAG assistant
+              for call-center agents that cut average handle time. Technical lead for GenAI/NLP,
+              mentoring a small ML/DS team.
             </p>
           </li>
         </ol>

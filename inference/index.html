@@ -121,7 +121,15 @@
           KV cache bytes =
           <code>2 &times; layers &times; kv_heads &times; head_dim &times; dtype_bytes &times; seq_len &times; batch</code>.
           The <code>2</code> is for keys <em>and</em> values. Grouped-query attention (GQA) shrinks
-          <code>kv_heads</code>; quantization shrinks <code>dtype_bytes</code>.
+          <code>kv_heads</code>; quantization shrinks <code>dtype_bytes</code>. Presets below use
+          verified configs (Qwen3, gpt-oss, Llama, Mistral).
+        </p>
+        <p class="lab-copy" style="margin-top:-0.6rem">
+          <strong>Caveat:</strong> this formula assumes standard MHA/GQA/MQA. Models with
+          <em>Multi-head Latent Attention</em> (DeepSeek&nbsp;V3/V3.2) compress K/V into a low-rank
+          latent, and <em>local/global</em> attention (Gemma&nbsp;3) bounds most layers with a sliding
+          window &mdash; both store far less than the naive formula predicts, so they&rsquo;re noted rather
+          than presetted here.
         </p>
 
         <div class="calc">
@@ -129,11 +137,19 @@
             <label class="viz-field">
               <span>Model preset</span>
               <select id="calc-preset">
-                <option value="l31-8b">Llama&nbsp;3.1&nbsp;8B (GQA)</option>
-                <option value="l31-70b">Llama&nbsp;3.1&nbsp;70B (GQA)</option>
-                <option value="qwen25-7b">Qwen2.5&nbsp;7B (GQA)</option>
-                <option value="mistral-7b">Mistral&nbsp;7B (GQA)</option>
-                <option value="l2-13b">Llama&nbsp;2&nbsp;13B (MHA)</option>
+                <optgroup label="Newer open models (2025–2026)">
+                  <option value="qwen3-8b">Qwen3&nbsp;8B (GQA)</option>
+                  <option value="qwen3-32b">Qwen3&nbsp;32B (GQA)</option>
+                  <option value="qwen3-235b">Qwen3&nbsp;235B-A22B (MoE, GQA)</option>
+                  <option value="gptoss-20b">gpt-oss&nbsp;20B (MoE, GQA)</option>
+                </optgroup>
+                <optgroup label="Established">
+                  <option value="l31-8b">Llama&nbsp;3.1&nbsp;8B (GQA)</option>
+                  <option value="l31-70b">Llama&nbsp;3.1&nbsp;70B (GQA)</option>
+                  <option value="qwen25-7b">Qwen2.5&nbsp;7B (GQA)</option>
+                  <option value="mistral-7b">Mistral&nbsp;7B (GQA)</option>
+                  <option value="l2-13b">Llama&nbsp;2&nbsp;13B (MHA)</option>
+                </optgroup>
                 <option value="custom">Custom&hellip;</option>
               </select>
             </label>
