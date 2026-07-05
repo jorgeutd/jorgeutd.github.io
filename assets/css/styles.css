@@ -161,11 +161,10 @@ img, svg { max-width: 100%; }
 .hero__bg {
   position: absolute;
   inset: 0;
-  opacity: 0.5;
+  opacity: 0.7;
   pointer-events: none;
 }
-.neural { width: 100%; height: 100%; }
-.neural__nodes circle { opacity: 0.85; }
+.hero-net { display: block; width: 100%; height: 100%; }
 .hero__inner { position: relative; }
 .hero__eyebrow {
   color: var(--accent);
@@ -308,6 +307,29 @@ img, svg { max-width: 100%; }
 .timeline__role { margin: 0 0 0.15rem; font-size: 1.15rem; }
 .timeline__org { margin: 0 0 0.7rem; color: var(--accent); font-weight: 600; }
 .timeline__desc { margin: 0; color: var(--text-muted); }
+
+/* Inference Lab callout ---------------------------------------------------- */
+.lab-cta {
+  position: relative;
+  background:
+    radial-gradient(600px 220px at 90% 0%, rgba(124, 199, 255, 0.14), transparent 60%),
+    var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: clamp(1.4rem, 4vw, 2.4rem);
+  overflow: hidden;
+}
+.lab-cta::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+}
+.lab-cta__text { max-width: 68ch; }
+.lab-cta__text .section__title { margin-top: 0; }
+.lab-cta__text p { color: var(--text-muted); margin: 0 0 1.4rem; }
+.lab-cta__text p strong { color: var(--text); }
 
 /* Contact ------------------------------------------------------------------ */
 .contact__lede { color: var(--text-muted); max-width: 56ch; margin: 0 0 1.5rem; }

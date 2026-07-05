@@ -43,62 +43,80 @@
     targets.forEach(function (el) { io.observe(el); });
   }
 
-  /* Decorative neural-network motif in the hero */
-  var svg = document.querySelector(".neural");
-  if (svg) { buildNeural(svg); }
+  /* Animated neural-network background (canvas). Decorative, aria-hidden.
+     Reduced motion -> one static frame, no loop. Offscreen -> paused. */
+  Array.prototype.forEach.call(document.querySelectorAll("canvas[data-net]"), initNet);
 
-  function buildNeural(root) {
-    var W = 800, H = 600;
-    var edgesG = root.querySelector(".neural__edges");
-    var nodesG = root.querySelector(".neural__nodes");
-    if (!edgesG || !nodesG) { return; }
+  function initNet(canvas) {
+    var ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var W = 0, H = 0, nodes = [], raf = 0, running = false;
+    var LINK = 130, ACCENT = "124,199,255", ACCENT2 = "167,139,250";
 
-    var layers = [
-      { x: 120, count: 4 },
-      { x: 320, count: 6 },
-      { x: 520, count: 6 },
-      { x: 700, count: 3 }
-    ];
-    var points = [];
-    layers.forEach(function (layer) {
-      var gap = H / (layer.count + 1);
-      var col = [];
-      for (var i = 1; i <= layer.count; i++) {
-        col.push({ x: layer.x, y: Math.round(gap * i) });
-      }
-      points.push(col);
-    });
-
-    var svgns = "http://www.w3.org/2000/svg";
-    /* edges between adjacent layers */
-    for (var l = 0; l < points.length - 1; l++) {
-      points[l].forEach(function (a) {
-        points[l + 1].forEach(function (b) {
-          var line = document.createElementNS(svgns, "line");
-          line.setAttribute("x1", a.x); line.setAttribute("y1", a.y);
-          line.setAttribute("x2", b.x); line.setAttribute("y2", b.y);
-          line.setAttribute("stroke-opacity", "0.18");
-          edgesG.appendChild(line);
+    function resize() {
+      var rect = canvas.getBoundingClientRect();
+      W = Math.max(1, Math.floor(rect.width));
+      H = Math.max(1, Math.floor(rect.height));
+      canvas.width = W * dpr; canvas.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var target = Math.round(Math.min(70, Math.max(22, (W * H) / 16000)));
+      nodes = [];
+      for (var i = 0; i < target; i++) {
+        nodes.push({
+          x: Math.random() * W, y: Math.random() * H,
+          vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.35,
+          r: 1.4 + Math.random() * 1.8, ph: Math.random() * Math.PI * 2
         });
-      });
-    }
-    /* nodes */
-    var all = [];
-    points.forEach(function (col) { col.forEach(function (p) { all.push(p); }); });
-    all.forEach(function (p, idx) {
-      var c = document.createElementNS(svgns, "circle");
-      c.setAttribute("cx", p.x); c.setAttribute("cy", p.y); c.setAttribute("r", "4.5");
-      nodesG.appendChild(c);
-      if (!reduceMotion) {
-        var anim = document.createElementNS(svgns, "animate");
-        anim.setAttribute("attributeName", "opacity");
-        anim.setAttribute("values", "0.35;1;0.35");
-        anim.setAttribute("dur", (3 + (idx % 5) * 0.6).toFixed(1) + "s");
-        anim.setAttribute("begin", (idx * 0.15).toFixed(2) + "s");
-        anim.setAttribute("repeatCount", "indefinite");
-        c.appendChild(anim);
       }
+    }
+
+    function frame(t) {
+      ctx.clearRect(0, 0, W, H);
+      for (var i = 0; i < nodes.length; i++) {
+        var a = nodes[i];
+        if (running) {
+          a.x += a.vx; a.y += a.vy;
+          if (a.x < 0 || a.x > W) a.vx *= -1;
+          if (a.y < 0 || a.y > H) a.vy *= -1;
+        }
+        for (var j = i + 1; j < nodes.length; j++) {
+          var b = nodes[j], dx = a.x - b.x, dy = a.y - b.y, d = Math.hypot(dx, dy);
+          if (d < LINK) {
+            var o = (1 - d / LINK) * 0.5;
+            ctx.strokeStyle = "rgba(" + (j % 2 ? ACCENT : ACCENT2) + "," + o.toFixed(3) + ")";
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+          }
+        }
+      }
+      for (var k = 0; k < nodes.length; k++) {
+        var n = nodes[k];
+        var pulse = running ? 0.6 + 0.4 * Math.sin(t / 900 + n.ph) : 0.85;
+        ctx.fillStyle = "rgba(" + ACCENT + "," + pulse.toFixed(3) + ")";
+        ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2); ctx.fill();
+      }
+      if (running) raf = requestAnimationFrame(frame);
+    }
+
+    function start() { if (running || reduceMotion) return; running = true; raf = requestAnimationFrame(frame); }
+    function stop() { running = false; if (raf) cancelAnimationFrame(raf); }
+
+    var rt;
+    window.addEventListener("resize", function () {
+      clearTimeout(rt);
+      rt = setTimeout(function () { resize(); frame(performance.now()); }, 150);
     });
-    root.setAttribute("viewBox", "0 0 " + W + " " + H);
+
+    resize();
+    frame(performance.now()); // static first paint (also the only paint under reduced motion)
+
+    if (!reduceMotion) {
+      if ("IntersectionObserver" in window) {
+        new IntersectionObserver(function (es) {
+          es[0].isIntersecting ? start() : stop();
+        }, { threshold: 0.01 }).observe(canvas);
+      } else { start(); }
+    }
   }
 })();

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>document.documentElement.classList.remove('no-js');document.documentElement.classList.add('js');</script>
+  <meta name="color-scheme" content="dark" />
+  <title>Inference Lab — KV Caching &amp; SOTA LLM Serving · Jorge Grisman</title>
+  <meta name="description" content="An interactive, technically accurate visualization of the transformer KV cache and state-of-the-art LLM inference techniques: PagedAttention, continuous batching, speculative decoding, GQA/MQA, prefix caching, and KV quantization." />
+  <meta name="author" content="Jorge Lopez Grisman" />
+  <meta name="theme-color" content="#0b0f1a" />
+  <link rel="canonical" href="https://jorgeutd.github.io/inference/" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Jorge Grisman" />
+  <meta property="og:title" content="Inference Lab — KV Caching &amp; SOTA LLM Serving" />
+  <meta property="og:description" content="Interactive visualization of the transformer KV cache and state-of-the-art LLM inference: PagedAttention, continuous batching, speculative decoding, GQA/MQA, KV quantization." />
+  <meta property="og:url" content="https://jorgeutd.github.io/inference/" />
+  <meta property="og:image" content="https://jorgeutd.github.io/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@jorge_utd" />
+  <meta name="twitter:image" content="https://jorgeutd.github.io/og-image.png" />
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate icon" href="/favicon.png" type="image/png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <link rel="stylesheet" href="/assets/css/inference.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="site-header">
+    <nav class="nav" aria-label="Primary">
+      <a class="nav__brand" href="/" aria-label="Jorge Grisman — home">
+        <span class="nav__brand-mark" aria-hidden="true">JG</span>
+        <span class="nav__brand-text">Jorge Grisman</span>
+      </a>
+      <button class="nav__toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Open menu">
+        <span class="nav__toggle-bar" aria-hidden="true"></span>
+      </button>
+      <ul class="nav__menu" id="nav-menu">
+        <li><a href="/#projects">Projects</a></li>
+        <li><a href="/#skills">Skills</a></li>
+        <li><a href="/inference/" aria-current="page">Inference Lab</a></li>
+        <li><a href="/#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="lab-hero" aria-labelledby="lab-title">
+      <div class="hero__bg" aria-hidden="true"><canvas class="hero-net" data-net></canvas></div>
+      <div class="container lab-hero__inner">
+        <p class="hero__eyebrow">Inference Lab</p>
+        <h1 id="lab-title" class="lab-hero__title">The KV cache, visualized</h1>
+        <p class="lab-hero__lede">
+          Autoregressive decoding is fast because the model never recomputes attention over
+          past tokens &mdash; it caches their keys and values. That cache is also the main thing
+          standing between you and a bigger batch, a longer context, or a cheaper GPU. Here is
+          how it grows, and the state-of-the-art tricks that tame it.
+        </p>
+        <p class="lab-hero__note" role="note">
+          Interactive. Everything below runs locally in your browser &mdash; no data leaves the page.
+        </p>
+      </div>
+    </section>
+
+    <!-- KV CACHE DECODE VISUALIZER -->
+    <section class="section" id="viz" aria-labelledby="viz-title">
+      <div class="container">
+        <h2 class="section__title" id="viz-title">1 &middot; Watch the cache fill</h2>
+        <p class="lab-copy">
+          The model first <strong>prefills</strong> the prompt (all tokens in parallel), then
+          <strong>decodes</strong> one token at a time. Each new token computes attention against
+          every cached key/value, then appends its own &mdash; so the cache, and the memory it costs,
+          grow linearly with sequence length.
+        </p>
+
+        <div class="viz-panel">
+          <canvas id="kv-canvas" class="viz-canvas" role="img"
+            aria-label="Animation of a transformer KV cache filling token by token during decoding."></canvas>
+
+          <div class="viz-controls" role="group" aria-label="Visualization controls">
+            <button class="btn btn--primary" id="viz-play" type="button">Play</button>
+            <button class="btn btn--ghost" id="viz-step" type="button">Step +1 token</button>
+            <button class="btn btn--ghost" id="viz-reset" type="button">Reset</button>
+            <label class="viz-field">
+              <span>Context length: <output id="viz-ctx-out">64</output> tokens</span>
+              <input id="viz-ctx" type="range" min="16" max="256" step="8" value="64" />
+            </label>
+            <label class="viz-field">
+              <span>Speed</span>
+              <input id="viz-speed" type="range" min="1" max="20" step="1" value="8"
+                aria-label="Animation speed (tokens per second)" />
+            </label>
+          </div>
+
+          <dl class="viz-stats" aria-live="polite">
+            <div><dt>Phase</dt><dd id="stat-phase">prefill</dd></div>
+            <div><dt>Tokens cached</dt><dd id="stat-tokens">0</dd></div>
+            <div><dt>KV cache size</dt><dd id="stat-mem">0 MiB</dd></div>
+            <div><dt>Per-token cost</dt><dd id="stat-pertok">128 KiB</dd></div>
+          </dl>
+          <p class="viz-legend" aria-hidden="true">
+            <span class="key key--prompt"></span> prompt (prefill)
+            <span class="key key--gen"></span> generated (decode)
+            <span class="key key--active"></span> current token attending to cache
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- MEMORY CALCULATOR -->
+    <section class="section section--alt" id="calc" aria-labelledby="calc-title">
+      <div class="container">
+        <h2 class="section__title" id="calc-title">2 &middot; Size any model&rsquo;s KV cache</h2>
+        <p class="lab-copy">
+          KV cache bytes =
+          <code>2 &times; layers &times; kv_heads &times; head_dim &times; dtype_bytes &times; seq_len &times; batch</code>.
+          The <code>2</code> is for keys <em>and</em> values. Grouped-query attention (GQA) shrinks
+          <code>kv_heads</code>; quantization shrinks <code>dtype_bytes</code>.
+        </p>
+
+        <div class="calc">
+          <form class="calc__form" id="calc-form" aria-label="KV cache calculator">
+            <label class="viz-field">
+              <span>Model preset</span>
+              <select id="calc-preset">
+                <option value="l31-8b">Llama&nbsp;3.1&nbsp;8B (GQA)</option>
+                <option value="l31-70b">Llama&nbsp;3.1&nbsp;70B (GQA)</option>
+                <option value="qwen25-7b">Qwen2.5&nbsp;7B (GQA)</option>
+                <option value="mistral-7b">Mistral&nbsp;7B (GQA)</option>
+                <option value="l2-13b">Llama&nbsp;2&nbsp;13B (MHA)</option>
+                <option value="custom">Custom&hellip;</option>
+              </select>
+            </label>
+            <label class="viz-field"><span>Layers</span><input id="calc-layers" type="number" min="1" max="200" value="32" /></label>
+            <label class="viz-field"><span>KV heads</span><input id="calc-kvheads" type="number" min="1" max="128" value="8" /></label>
+            <label class="viz-field"><span>Head dim</span><input id="calc-headdim" type="number" min="16" max="512" step="8" value="128" /></label>
+            <label class="viz-field">
+              <span>KV dtype</span>
+              <select id="calc-dtype">
+                <option value="2">FP16 / BF16 (2 B)</option>
+                <option value="1">FP8 / INT8 (1 B)</option>
+                <option value="0.5">INT4 (0.5 B)</option>
+              </select>
+            </label>
+            <label class="viz-field"><span>Context length</span><input id="calc-seq" type="number" min="128" max="1048576" step="128" value="8192" /></label>
+            <label class="viz-field"><span>Batch (concurrent seqs)</span><input id="calc-batch" type="number" min="1" max="1024" value="1" /></label>
+            <label class="viz-field">
+              <span>GPU memory</span>
+              <select id="calc-gpu">
+                <option value="24">24 GB (RTX 4090)</option>
+                <option value="48">48 GB (L40S / A6000)</option>
+                <option value="80" selected>80 GB (A100 / H100)</option>
+                <option value="141">141 GB (H200)</option>
+              </select>
+            </label>
+          </form>
+
+          <div class="calc__out" aria-live="polite">
+            <p class="calc__big"><span id="calc-total">1.00</span> <span id="calc-unit">GiB</span></p>
+            <p class="calc__sub">per-token: <strong id="calc-pertok">128 KiB</strong> &middot; that&rsquo;s <strong id="calc-pct">1.3%</strong> of the selected GPU</p>
+            <div class="calc__bar" role="img" aria-label="KV cache as a fraction of GPU memory">
+              <span class="calc__bar-fill" id="calc-fill" style="width:1.3%"></span>
+            </div>
+            <p class="calc__hint" id="calc-hint"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOTA TECHNIQUES -->
+    <section class="section" id="techniques" aria-labelledby="tech-title">
+      <div class="container">
+        <h2 class="section__title" id="tech-title">3 &middot; State-of-the-art serving</h2>
+        <p class="lab-copy">Six techniques that decide throughput, latency, and cost in production. Toggle the interactive ones.</p>
+
+        <div class="tech-grid">
+          <!-- PagedAttention -->
+          <article class="tech" aria-labelledby="t-paged">
+            <h3 id="t-paged">PagedAttention <span class="tech__src">vLLM, Kwon et&nbsp;al. 2023</span></h3>
+            <p>Reserving one contiguous slab per sequence at max length wastes most of it to
+              internal fragmentation. PagedAttention stores the cache in fixed-size <em>blocks</em>
+              (like OS paging), allocated on demand and shareable across sequences.</p>
+            <div class="tech__viz" id="paged-viz" aria-hidden="true"></div>
+            <div class="viz-controls viz-controls--mini">
+              <button class="btn btn--ghost" id="paged-toggle" type="button" aria-pressed="false">Show contiguous (naive)</button>
+              <span class="tech__metric" id="paged-metric">Paged: ~4% waste</span>
+            </div>
+          </article>
+
+          <!-- Continuous batching -->
+          <article class="tech" aria-labelledby="t-batch">
+            <h3 id="t-batch">Continuous batching <span class="tech__src">Orca, Yu et&nbsp;al. 2022</span></h3>
+            <p>Static batching stalls the whole batch until the slowest sequence finishes, padding
+              the rest. Continuous (iteration-level) batching evicts finished sequences and admits
+              new ones every step, keeping the GPU saturated.</p>
+            <div class="tech__viz" id="batch-viz" aria-hidden="true"></div>
+            <div class="viz-controls viz-controls--mini">
+              <button class="btn btn--ghost" id="batch-toggle" type="button" aria-pressed="false">Show static batching</button>
+              <span class="tech__metric" id="batch-metric">Continuous: GPU busy ~95%</span>
+            </div>
+          </article>
+
+          <!-- Speculative decoding -->
+          <article class="tech" aria-labelledby="t-spec">
+            <h3 id="t-spec">Speculative decoding <span class="tech__src">Leviathan / Chen 2023</span></h3>
+            <p>A small <em>draft</em> model proposes several tokens; the large <em>target</em> model
+              verifies them in a single parallel pass and keeps the longest correct prefix. Same
+              output distribution, fewer expensive forward passes. EAGLE-2/3 are the dominant
+              production variants in 2026.</p>
+            <div class="tech__viz" id="spec-viz" aria-hidden="true"></div>
+            <div class="viz-controls viz-controls--mini">
+              <button class="btn btn--ghost" id="spec-run" type="button">Run a round</button>
+              <span class="tech__metric" id="spec-metric">idle</span>
+            </div>
+          </article>
+
+          <!-- GQA / MQA -->
+          <article class="tech" aria-labelledby="t-gqa">
+            <h3 id="t-gqa">MHA &rarr; GQA &rarr; MQA <span class="tech__src">Shazeer 2019; Ainslie 2023</span></h3>
+            <p>Query heads can share key/value heads. Fewer KV heads means a proportionally smaller
+              cache &mdash; the reason modern models ship with GQA.</p>
+            <div class="tech__viz" id="gqa-viz" aria-hidden="true"></div>
+            <div class="viz-controls viz-controls--mini">
+              <button class="btn btn--ghost" id="gqa-cycle" type="button">Cycle: MHA / GQA / MQA</button>
+              <span class="tech__metric" id="gqa-metric">GQA: 8 KV heads &rarr; 4&times; smaller cache</span>
+            </div>
+          </article>
+
+          <!-- Prefix caching -->
+          <article class="tech" aria-labelledby="t-prefix">
+            <h3 id="t-prefix">Prefix / prompt caching</h3>
+            <p>Requests that share a prefix (a long system prompt, a few-shot preamble, a document)
+              can reuse its already-computed KV instead of prefilling it again &mdash; big latency and
+              cost wins for agents and RAG. vLLM ships automatic prefix caching; SGLang generalizes
+              it with <em>RadixAttention</em>, a radix tree over cached prefixes.</p>
+            <div class="tech__viz tech__viz--static" id="prefix-viz" aria-hidden="true"></div>
+            <p class="tech__metric">Shared prefill computed once, reused N times.</p>
+          </article>
+
+          <!-- KV quantization -->
+          <article class="tech" aria-labelledby="t-quant">
+            <h3 id="t-quant">KV cache quantization</h3>
+            <p>Keys and values don&rsquo;t need FP16. Storing them in FP8 or INT8 (often with
+              per-channel/per-token scales) halves or quarters cache memory, unlocking longer
+              context or larger batches with minimal quality loss.</p>
+            <div class="tech__viz tech__viz--static" id="quant-viz" aria-hidden="true"></div>
+            <p class="tech__metric" id="quant-metric">FP16 &rarr; FP8: 2&times; more context in the same memory.</p>
+          </article>
+
+          <!-- Chunked prefill + PD disaggregation -->
+          <article class="tech" aria-labelledby="t-disagg">
+            <h3 id="t-disagg">Chunked prefill &amp; PD disaggregation <span class="tech__src">Sarathi; Splitwise / DistServe / Mooncake</span></h3>
+            <p>Prefill is compute-bound; decode is memory-bandwidth-bound. <em>Chunked prefill</em>
+              splits long prompts so decode isn&rsquo;t starved. <em>Prefill/decode disaggregation</em>
+              runs the two phases on separate GPU pools and streams the KV cache between them
+              (NVIDIA Dynamo, Mooncake), reported at 1.5&ndash;3&times; throughput and lower TTFT.</p>
+            <div class="tech__viz" id="disagg-viz" aria-hidden="true"></div>
+            <div class="viz-controls viz-controls--mini">
+              <button class="btn btn--ghost" id="disagg-toggle" type="button" aria-pressed="false">Show colocated (contention)</button>
+              <span class="tech__metric" id="disagg-metric">Disaggregated: prefill &amp; decode don&rsquo;t fight for the GPU</span>
+            </div>
+          </article>
+        </div>
+
+        <p class="lab-copy lab-copy--foot">
+          Underneath all of this, FlashAttention (now FlashAttention-3 on Hopper/Blackwell) makes
+          each attention step IO-aware &mdash; tiling in on-chip SRAM to cut HBM traffic &mdash; speeding up
+          prefill and decode without changing what the cache stores. In 2026, continuous batching,
+          paged KV, and FP8 are table stakes across vLLM, SGLang, and TensorRT-LLM; the differentiators
+          are prefix reuse (RadixAttention), speculative decoding (EAGLE), and KV-cache-centric
+          disaggregation. Together they are why one GPU can serve far more concurrent, longer
+          conversations than the naive math suggests.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <p><a href="/">&larr; Back to home</a></p>
+      <p class="site-footer__note">Built with vanilla HTML, CSS &amp; Canvas. No trackers.</p>
+    </div>
+  </footer>
+
+  <script src="/assets/js/main.js" defer></script>
+  <script src="/assets/js/inference.js" defer></script>
+</body>
+</html>

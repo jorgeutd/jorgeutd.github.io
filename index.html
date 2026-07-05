@@ -47,7 +47,6 @@
     "jobTitle": "Principal AI Engineer",
     "description": "Principal AI Engineer focused on AI agents and LLM inference.",
     "url": "https://jorgeutd.github.io/",
-    "address": { "@type": "PostalAddress", "addressLocality": "Columbus", "addressRegion": "OH", "addressCountry": "US" },
     "sameAs": [
       "https://github.com/jorgeutd",
       "https://www.linkedin.com/in/jorge-lopez-grisman",
@@ -73,6 +72,7 @@
         <li><a href="#projects">Projects</a></li>
         <li><a href="#skills">Skills</a></li>
         <li><a href="#experience">Experience</a></li>
+        <li><a href="/inference/">Inference Lab</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
     </nav>
@@ -82,25 +82,17 @@
     <!-- HERO -->
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero__bg" aria-hidden="true">
-        <svg class="neural" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" role="presentation" focusable="false">
-          <defs>
-            <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#7cc7ff" stop-opacity="0.9" />
-              <stop offset="1" stop-color="#a78bfa" stop-opacity="0.9" />
-            </linearGradient>
-          </defs>
-          <g class="neural__edges" stroke="url(#edge)" stroke-width="1"></g>
-          <g class="neural__nodes" fill="#7cc7ff"></g>
-        </svg>
+        <canvas class="hero-net" data-net></canvas>
       </div>
       <div class="container hero__inner">
-        <p class="hero__eyebrow">Columbus, OH · Available for principal-level AI work</p>
+        <p class="hero__eyebrow">Production AI &middot; Agents &middot; On-device &amp; Cloud Inference</p>
         <h1 id="hero-title" class="hero__title">Jorge Grisman</h1>
         <p class="hero__role">Principal AI Engineer — <span class="accent">AI Agents &amp; LLM Inference</span></p>
         <p class="hero__lede">
           I design and ship production AI systems end to end: multi-agent architectures,
           on-device and cloud LLM/STT inference, MCP tooling, and the evaluation,
-          observability, and release governance that make them safe to run.
+          observability, and release governance that make them safe to run &mdash; built,
+          deployed, monitored, and evaluated for <strong>10k+ users</strong>.
         </p>
         <div class="hero__actions">
           <a class="btn btn--primary" href="#projects">View projects</a>
@@ -117,8 +109,9 @@
           <p>
             I build production AI systems end to end — multi-agent architectures, on-device and cloud
             LLM/STT inference, MCP tooling, and the evaluation, observability, and release governance
-            that make them safe to run. 12+ years operating at Staff+/Principal level across data
-            science, ML engineering, and GenAI in retail, insurance, and healthcare.
+            that make them safe to run. I&rsquo;ve built, deployed, monitored, and run evaluations for
+            systems serving <strong>10,000+ users</strong>. 12+ years operating at Staff+/Principal
+            level across data science, ML engineering, and GenAI in retail, insurance, and healthcare.
           </p>
           <p>
             My work spans agents in production (multi-agent swarms serving tens of thousands of daily
@@ -192,8 +185,27 @@
       </div>
     </section>
 
+    <!-- INFERENCE LAB CALLOUT -->
+    <section class="section" id="lab" aria-labelledby="lab-cta-title">
+      <div class="container">
+        <div class="lab-cta">
+          <div class="lab-cta__text">
+            <h2 class="section__title" id="lab-cta-title">Interactive: Inference Lab</h2>
+            <p>
+              An interactive, technically accurate visualization of the transformer
+              <strong>KV cache</strong> and the state-of-the-art serving techniques that make
+              LLMs cheap to run at scale &mdash; PagedAttention, continuous batching, speculative
+              decoding, GQA/MQA, prefix caching, and KV quantization. Watch the cache fill in
+              real time and size any model&rsquo;s cache yourself.
+            </p>
+            <a class="btn btn--primary" href="/inference/">Open the Inference Lab &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- SKILLS -->
-    <section class="section" id="skills" aria-labelledby="skills-title">
+    <section class="section section--alt" id="skills" aria-labelledby="skills-title">
       <div class="container">
         <h2 class="section__title" id="skills-title">Skills</h2>
         <div class="skills">
@@ -201,7 +213,7 @@
             <h3 class="skill-group__title">Agents &amp; orchestration</h3>
             <ul class="chips" role="list">
               <li>LangGraph</li><li>LangChain</li><li>Strands Agents</li><li>LlamaIndex</li>
-              <li>MCP / FastMCP</li><li>OpenAI Responses API</li>
+              <li>MCP / FastMCP</li><li>Deep Agents</li><li>OpenAI Agents SDK</li>
             </ul>
           </div>
           <div class="skill-group">
@@ -229,7 +241,7 @@
     </section>
 
     <!-- EXPERIENCE -->
-    <section class="section section--alt" id="experience" aria-labelledby="experience-title">
+    <section class="section" id="experience" aria-labelledby="experience-title">
       <div class="container">
         <h2 class="section__title" id="experience-title">Career highlights</h2>
         <ol class="timeline" role="list">
@@ -262,7 +274,7 @@
     </section>
 
     <!-- CONTACT -->
-    <section class="section" id="contact" aria-labelledby="contact-title">
+    <section class="section section--alt" id="contact" aria-labelledby="contact-title">
       <div class="container contact">
         <h2 class="section__title" id="contact-title">Let&rsquo;s connect</h2>
         <p class="contact__lede">Building something in agents or on-device inference? I&rsquo;d like to hear about it.</p>
