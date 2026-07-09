@@ -146,4 +146,55 @@
   [elTemp, elK, elP].forEach(function (el) { el.addEventListener("input", update); });
   window.addEventListener("resize", function () { draw(distribution(+elTemp.value, +elK.value, +elP.value)); });
   update();
+
+  /* ---------------------------------------------------------------- *
+   * Positional encoding heatmap (exact sinusoidal PE)
+   * ---------------------------------------------------------------- */
+  (function posenc() {
+    var cv = document.getElementById("pe-canvas");
+    if (!cv) return;
+    var elL = document.getElementById("pe-l"), elD = document.getElementById("pe-d");
+    var oL = document.getElementById("pe-l-out"), oD = document.getElementById("pe-d-out");
+    // diverging colormap stops: -1 -> accent2, 0 -> bg, +1 -> accent
+    var NEG = [167, 139, 250], ZERO = [11, 15, 26], POS = [124, 199, 255];
+    function mix(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
+    function color(v) { // v in [-1,1]
+      var c = v < 0 ? mix(ZERO, NEG, -v) : mix(ZERO, POS, v);
+      return "rgb(" + (c[0] | 0) + "," + (c[1] | 0) + "," + (c[2] | 0) + ")";
+    }
+    function draw() {
+      var L = +elL.value, D = +elD.value;
+      oL.textContent = L; oD.textContent = D;
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var rect = cv.getBoundingClientRect();
+      var W = Math.max(1, Math.floor(rect.width)), H = Math.max(1, Math.floor(rect.height));
+      cv.width = W * dpr; cv.height = H * dpr;
+      var ctx = cv.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      var padL = 40, padB = 18, padT = 6, padR = 6;
+      var gw = W - padL - padR, gh = H - padT - padB;
+      var cw = gw / D, ch = gh / L;
+      for (var pos = 0; pos < L; pos++) {
+        for (var i = 0; i < D; i++) {
+          var freq = Math.floor(i / 2);
+          var angle = pos / Math.pow(10000, (2 * freq) / D);
+          var val = (i % 2 === 0) ? Math.sin(angle) : Math.cos(angle);
+          ctx.fillStyle = color(val);
+          ctx.fillRect(padL + i * cw, padT + pos * ch, Math.ceil(cw), Math.ceil(ch));
+        }
+      }
+      // axis labels
+      ctx.fillStyle = MUTED; ctx.font = "500 10px -apple-system,Segoe UI,Roboto,sans-serif";
+      ctx.textAlign = "center"; ctx.textBaseline = "top";
+      ctx.fillText("dimension \u2192", padL + gw / 2, H - 12);
+      ctx.save();
+      ctx.translate(12, padT + gh / 2); ctx.rotate(-Math.PI / 2);
+      ctx.textBaseline = "middle"; ctx.fillText("position \u2192", 0, 0);
+      ctx.restore();
+    }
+    [elL, elD].forEach(function (el) { el.addEventListener("input", draw); });
+    window.addEventListener("resize", draw);
+    draw();
+  })();
 })();

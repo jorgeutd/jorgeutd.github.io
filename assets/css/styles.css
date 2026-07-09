@@ -29,7 +29,11 @@ html { scroll-behavior: smooth; }
 body {
   margin: 0;
   font-family: var(--font);
-  background: var(--bg);
+  background:
+    radial-gradient(1200px 620px at 100% -8%, rgba(124, 199, 255, 0.06), transparent 60%),
+    radial-gradient(1000px 700px at -12% 8%, rgba(167, 139, 250, 0.06), transparent 55%),
+    var(--bg);
+  background-attachment: fixed;
   color: var(--text);
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
@@ -283,6 +287,12 @@ img, svg { max-width: 100%; }
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1.3rem;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.skill-group:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  box-shadow: 0 12px 30px -20px rgba(124, 199, 255, 0.65);
 }
 .skill-group__title { margin: 0 0 0.9rem; font-size: 1.05rem; color: var(--accent); }
 .chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
@@ -324,7 +334,9 @@ img, svg { max-width: 100%; }
   border-radius: var(--radius);
   padding: 1.3rem 1.4rem;
   text-align: center;
+  transition: transform 0.18s ease, border-color 0.18s ease;
 }
+.stat:hover { transform: translateY(-3px); border-color: var(--accent); }
 .stat__num {
   display: block;
   font-size: clamp(1.9rem, 4.5vw, 2.6rem);

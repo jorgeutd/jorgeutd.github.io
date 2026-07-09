@@ -109,7 +109,18 @@
 
 /* Technique cards */
 .tech-grid { display: grid; gap: 1.1rem; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
-.tech { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.4rem; }
+.tech {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.4rem;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.tech:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  box-shadow: 0 14px 32px -20px rgba(124, 199, 255, 0.6);
+}
 .tech h3 { margin: 0 0 0.5rem; font-size: 1.15rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: baseline; }
 .tech__src { font-size: 0.72rem; font-weight: 500; color: var(--text-muted); }
 .tech p { color: var(--text-muted); margin: 0 0 1rem; font-size: 0.95rem; }

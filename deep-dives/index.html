@@ -114,10 +114,47 @@
       </div>
     </section>
 
-    <!-- PAPER EXPLAINERS -->
-    <section class="section section--alt" id="papers" aria-labelledby="papers-title">
+    <!-- POSITIONAL ENCODING -->
+    <section class="section section--alt" id="posenc" aria-labelledby="pe-title">
       <div class="container">
-        <h2 class="section__title" id="papers-title">2 &middot; The papers behind modern inference</h2>
+        <h2 class="section__title" id="pe-title">2 &middot; How a model knows token order</h2>
+        <p class="lab-copy">
+          Attention is permutation-invariant &mdash; on its own it has no sense of order. Sinusoidal
+          positional encodings give every position a unique, smoothly varying signature built from
+          sines and cosines at geometrically spaced frequencies:
+          <code>PE(pos,2i)=sin(pos / 10000^(2i/d))</code>,
+          <code>PE(pos,2i+1)=cos(&hellip;)</code>. Each <em>row</em> is a position, each
+          <em>column</em> a dimension. (RoPE, in the papers below, <em>rotates</em> query/key vectors
+          by these angles instead of adding them.)
+        </p>
+        <div class="viz-panel">
+          <canvas id="pe-canvas" class="viz-canvas" role="img"
+            aria-label="Heatmap of sinusoidal positional encodings: rows are token positions, columns are embedding dimensions, and color is the encoding value from -1 to +1."></canvas>
+          <div class="viz-controls" role="group" aria-label="Positional encoding controls">
+            <label class="viz-field">
+              <span>Sequence length: <output id="pe-l-out">48</output> positions</span>
+              <input id="pe-l" type="range" min="8" max="96" step="4" value="48" />
+            </label>
+            <label class="viz-field">
+              <span>Model dimension: <output id="pe-d-out">64</output></span>
+              <input id="pe-d" type="range" min="16" max="128" step="8" value="64" />
+            </label>
+          </div>
+          <p class="viz-legend" aria-hidden="true">
+            <span class="key" style="background:#a78bfa"></span> &minus;1
+            <span class="key" style="background:#0b0f1a;border:1px solid #243049"></span> 0
+            <span class="key" style="background:#7cc7ff"></span> +1
+            &mdash; low-dimension columns oscillate fast, high-dimension columns drift slowly, so every
+            position gets a unique fingerprint the model can learn to read.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAPER EXPLAINERS -->
+    <section class="section" id="papers" aria-labelledby="papers-title">
+      <div class="container">
+        <h2 class="section__title" id="papers-title">3 &middot; The papers behind modern inference</h2>
         <p class="lab-copy">Plain-English summaries of the work I lean on daily &mdash; what each one changed, and why it matters in production.</p>
         <div class="tech-grid">
 
@@ -168,6 +205,20 @@
             <p><strong>TL;DR:</strong> freeze the base model and train tiny low-rank adapters; QLoRA does it on a 4-bit-quantized base.</p>
             <p>Fine-tune large models on a single GPU with a fraction of the memory &mdash; how I adapt open models (Llama, Gemma, DeBERTa) for function calling and domain tasks.</p>
             <p class="tech__metric"><a href="https://arxiv.org/abs/2305.14314" rel="noopener">arXiv:2305.14314 &rarr;</a></p>
+          </article>
+
+          <article class="tech" aria-labelledby="p-rope">
+            <h3 id="p-rope">Rotary Position Embeddings (RoPE) <span class="tech__src">Su et&nbsp;al., 2021</span></h3>
+            <p><strong>TL;DR:</strong> encode position by <em>rotating</em> query/key vectors by an angle proportional to position, rather than adding a positional vector.</p>
+            <p>Relative position falls out of the dot product for free, and it extrapolates to longer contexts (with scaling like YaRN). Used by Llama, Qwen, Mistral, and most modern open models.</p>
+            <p class="tech__metric"><a href="https://arxiv.org/abs/2104.09864" rel="noopener">arXiv:2104.09864 &rarr;</a></p>
+          </article>
+
+          <article class="tech" aria-labelledby="p-moe">
+            <h3 id="p-moe">Mixture-of-Experts (Mixtral) <span class="tech__src">Jiang et&nbsp;al., 2024</span></h3>
+            <p><strong>TL;DR:</strong> route each token to a few expert FFNs out of many, so <em>total</em> parameters far exceed the <em>active</em> parameters per token.</p>
+            <p>Big-model quality at small-model inference compute &mdash; the design behind Mixtral, Qwen3-235B-A22B, gpt-oss, and DeepSeek. Attention/KV still dominates memory; MoE cuts the compute.</p>
+            <p class="tech__metric"><a href="https://arxiv.org/abs/2401.04088" rel="noopener">arXiv:2401.04088 &rarr;</a></p>
           </article>
 
         </div>
