@@ -308,6 +308,38 @@ img, svg { max-width: 100%; }
 .timeline__org { margin: 0 0 0.7rem; color: var(--accent); font-weight: 600; }
 .timeline__desc { margin: 0; color: var(--text-muted); }
 
+/* Impact stats band -------------------------------------------------------- */
+.impact-section { padding-block: clamp(2rem, 5vw, 3rem); }
+.stats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.3rem 1.4rem;
+  text-align: center;
+}
+.stat__num {
+  display: block;
+  font-size: clamp(1.9rem, 4.5vw, 2.6rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-variant-numeric: tabular-nums;
+}
+.stat__unit { font-size: 0.5em; font-weight: 700; -webkit-text-fill-color: var(--text-muted); }
+.stat__label { display: block; margin-top: 0.4rem; color: var(--text-muted); font-size: 0.9rem; }
+
 /* Inference Lab callout ---------------------------------------------------- */
 .lab-cta {
   position: relative;

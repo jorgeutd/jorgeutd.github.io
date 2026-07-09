@@ -73,6 +73,7 @@
         <li><a href="#skills">Skills</a></li>
         <li><a href="#experience">Experience</a></li>
         <li><a href="/inference/">Inference Lab</a></li>
+        <li><a href="/deep-dives/">Deep Dives</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
     </nav>
@@ -98,6 +99,18 @@
           <a class="btn btn--primary" href="#projects">View projects</a>
           <a class="btn btn--ghost" href="#contact">Get in touch</a>
         </div>
+      </div>
+    </section>
+
+    <!-- IMPACT -->
+    <section class="section impact-section" id="impact" aria-label="Impact at a glance">
+      <div class="container">
+        <ul class="stats" role="list">
+          <li class="stat"><span class="stat__num">100k+</span><span class="stat__label">users served</span></li>
+          <li class="stat"><span class="stat__num">~$1.2M<span class="stat__unit">/yr</span></span><span class="stat__label">cloud-inference cost eliminated</span></li>
+          <li class="stat"><span class="stat__num">$2.7M<span class="stat__unit">/yr</span></span><span class="stat__label">contact-center savings</span></li>
+          <li class="stat"><span class="stat__num">12+</span><span class="stat__label">years shipping production AI</span></li>
+        </ul>
       </div>
     </section>
 
@@ -196,9 +209,14 @@
               <strong>KV cache</strong> and the state-of-the-art serving techniques that make
               LLMs cheap to run at scale &mdash; PagedAttention, continuous batching, speculative
               decoding, GQA/MQA, prefix caching, and KV quantization. Watch the cache fill in
-              real time and size any model&rsquo;s cache yourself.
+              real time and size any model&rsquo;s cache yourself. The <strong>Papers &amp; Deep Dives</strong>
+              page adds a live decoding playground (temperature, top-k, top-p) and concise explainers of
+              the research behind modern inference.
             </p>
-            <a class="btn btn--primary" href="/inference/">Open the Inference Lab &rarr;</a>
+            <div class="hero__actions">
+              <a class="btn btn--primary" href="/inference/">Open the Inference Lab &rarr;</a>
+              <a class="btn btn--ghost" href="/deep-dives/">Papers &amp; Deep Dives &rarr;</a>
+            </div>
           </div>
         </div>
       </div>
@@ -324,7 +342,7 @@
 
   <footer class="site-footer">
     <div class="container site-footer__inner">
-      <p>&copy; <span id="year">2026</span> Jorge Lopez Grisman</p>
+      <p>&copy; 2021&ndash;<span id="year">2026</span> Jorge Grisman</p>
       <p class="site-footer__note">Built with vanilla HTML, CSS &amp; JS. No trackers.</p>
     </div>
   </footer>

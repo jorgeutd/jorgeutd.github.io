@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>document.documentElement.classList.remove('no-js');document.documentElement.classList.add('js');</script>
+  <meta name="color-scheme" content="dark" />
+  <title>Papers &amp; Deep Dives — LLM Internals · Jorge Grisman</title>
+  <meta name="description" content="Interactive, mathematically honest explainers of how LLMs work: a live decoding playground (temperature, top-k, top-p) plus concise summaries of the papers behind modern inference — Attention, FlashAttention, PagedAttention, speculative decoding, MLA, RadixAttention, and LoRA." />
+  <meta name="author" content="Jorge Lopez Grisman" />
+  <meta name="theme-color" content="#0b0f1a" />
+  <link rel="canonical" href="https://jorgeutd.github.io/deep-dives/" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Jorge Grisman" />
+  <meta property="og:title" content="Papers &amp; Deep Dives — LLM Internals" />
+  <meta property="og:description" content="A live decoding playground (temperature/top-k/top-p) plus concise explainers of the papers behind modern LLM inference." />
+  <meta property="og:url" content="https://jorgeutd.github.io/deep-dives/" />
+  <meta property="og:image" content="https://jorgeutd.github.io/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@jorge_utd" />
+  <meta name="twitter:image" content="https://jorgeutd.github.io/og-image.png" />
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate icon" href="/favicon.png" type="image/png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <link rel="stylesheet" href="/assets/css/inference.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="site-header">
+    <nav class="nav" aria-label="Primary">
+      <a class="nav__brand" href="/" aria-label="Jorge Grisman — home">
+        <span class="nav__brand-mark" aria-hidden="true">JG</span>
+        <span class="nav__brand-text">Jorge Grisman</span>
+      </a>
+      <button class="nav__toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Open menu">
+        <span class="nav__toggle-bar" aria-hidden="true"></span>
+      </button>
+      <ul class="nav__menu" id="nav-menu">
+        <li><a href="/#projects">Projects</a></li>
+        <li><a href="/inference/">Inference Lab</a></li>
+        <li><a href="/deep-dives/" aria-current="page">Deep Dives</a></li>
+        <li><a href="/#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="lab-hero" aria-labelledby="dd-title">
+      <div class="hero__bg" aria-hidden="true"><canvas class="hero-net" data-net></canvas></div>
+      <div class="container lab-hero__inner">
+        <p class="hero__eyebrow">Papers &amp; Deep Dives</p>
+        <h1 id="dd-title" class="lab-hero__title">How LLMs actually work</h1>
+        <p class="lab-hero__lede">
+          The interesting part of an LLM isn&rsquo;t that it predicts the next token &mdash; it&rsquo;s
+          <em>how</em> you shape that prediction into useful text, and the papers that made it fast
+          enough to serve at scale. Below: a live, honest decoding playground, then short explainers
+          of the work behind modern inference.
+        </p>
+        <p class="lab-hero__note" role="note">Interactive &mdash; runs entirely in your browser; no data leaves the page.</p>
+      </div>
+    </section>
+
+    <!-- DECODING PLAYGROUND -->
+    <section class="section" id="decode" aria-labelledby="decode-title">
+      <div class="container">
+        <h2 class="section__title" id="decode-title">1 &middot; How a model picks the next token</h2>
+        <p class="lab-copy">
+          A model outputs a <strong>logit</strong> for every token in its vocabulary. Softmax turns
+          those into probabilities; <strong>temperature</strong> sharpens or flattens them, and
+          <strong>top-k</strong> / <strong>top-p (nucleus)</strong> trim the long tail before a token
+          is sampled. Try it on this example distribution for the prompt
+          <code>&ldquo;The capital of France is ___&rdquo;</code>.
+        </p>
+        <div class="viz-panel">
+          <canvas id="decode-canvas" class="viz-canvas" role="img"
+            aria-label="Bar chart of next-token probabilities that reshapes as temperature, top-k, and top-p change."></canvas>
+          <div class="viz-controls" role="group" aria-label="Decoding controls">
+            <label class="viz-field">
+              <span>Temperature: <output id="t-out">0.80</output></span>
+              <input id="dc-temp" type="range" min="0.05" max="2" step="0.05" value="0.8" />
+            </label>
+            <label class="viz-field">
+              <span>Top-k: <output id="k-out">off</output></span>
+              <input id="dc-topk" type="range" min="0" max="12" step="1" value="0" />
+            </label>
+            <label class="viz-field">
+              <span>Top-p (nucleus): <output id="p-out">1.00</output></span>
+              <input id="dc-topp" type="range" min="0.1" max="1" step="0.05" value="1" />
+            </label>
+          </div>
+          <dl class="viz-stats" aria-live="polite">
+            <div><dt>Most likely</dt><dd id="s-top">Paris</dd></div>
+            <div><dt>Tokens in pool</dt><dd id="s-kept">12</dd></div>
+            <div><dt>Entropy</dt><dd id="s-entropy">0.0 bits</dd></div>
+            <div><dt>P(top token)</dt><dd id="s-ptop">0%</dd></div>
+          </dl>
+          <p class="viz-legend" aria-hidden="true">
+            <span class="key key--gen"></span> in the sampling pool
+            <span class="key" style="background:#26324c"></span> trimmed by top-k / top-p
+          </p>
+          <p class="lab-copy" style="margin:0.8rem 0 0; font-size:0.9rem;">
+            <strong>Try:</strong> temperature <code>0.05</code> is near-greedy (always &ldquo;Paris&rdquo;);
+            crank it to <code>1.8</code> to see the tail light up; then set top-p <code>0.9</code> to
+            clip that tail back while keeping the head. This is exactly the math behind
+            <code>temperature</code>, <code>top_k</code>, and <code>top_p</code> in an inference server.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAPER EXPLAINERS -->
+    <section class="section section--alt" id="papers" aria-labelledby="papers-title">
+      <div class="container">
+        <h2 class="section__title" id="papers-title">2 &middot; The papers behind modern inference</h2>
+        <p class="lab-copy">Plain-English summaries of the work I lean on daily &mdash; what each one changed, and why it matters in production.</p>
+        <div class="tech-grid">
+
+          <article class="tech" aria-labelledby="p-attn">
+            <h3 id="p-attn">Attention Is All You Need <span class="tech__src">Vaswani et&nbsp;al., 2017</span></h3>
+            <p><strong>TL;DR:</strong> replace recurrence with <em>self-attention</em> &mdash; every token attends to every other in parallel.</p>
+            <p>The Transformer. Parallelizable, scalable, and the substrate every modern LLM is built on. Everything below exists to make this operation cheaper at inference time.</p>
+            <p class="tech__metric"><a href="https://arxiv.org/abs/1706.03762" rel="noopener">arXiv:1706.03762 &rarr;</a></p>
+          </article>
+
+          <article class="tech" aria-labelledby="p-flash">
+            <h3 id="p-flash">FlashAttention <span class="tech__src">Dao et&nbsp;al., 2022 (v2/v3 since)</span></h3>
+            <p><strong>TL;DR:</strong> exact attention, but <em>IO-aware</em> &mdash; tile the computation in on-chip SRAM to avoid round-trips to slow HBM.</p>
+            <p>Same math, far fewer memory reads/writes &mdash; big speedups and longer contexts for both training and inference. FlashAttention-3 targets Hopper/Blackwell.</p>
+            <p class="tech__metric"><a href="https://arxiv.org/abs/2205.14135" rel="noopener">arXiv:2205.14135 &rarr;</a></p>
+          </article>
+
+          <article class="tech" aria-labelledby="p-paged">
+            <h3 id="p-paged">PagedAttention / vLLM <span class="tech__src">Kwon et&nbsp;al., 2023</span></h3>
+            <p><strong>TL;DR:</strong> store the KV cache in fixed-size <em>pages</em> like virtual memory instead of one contiguous slab.</p>
+            <p>Kills internal fragmentation and lets sequences share blocks, so a GPU serves far more concurrent requests. Now the default memory model across serving stacks.</p>
+            <p class="tech__metric"><a href="https://arxiv.org/abs/2309.06180" rel="noopener">arXiv:2309.06180 &rarr;</a></p>
+          </article>
+
+          <article class="tech" aria-labelledby="p-spec">
+            <h3 id="p-spec">Speculative Decoding <span class="tech__src">Leviathan / Chen, 2023; EAGLE, 2024</span></h3>
+            <p><strong>TL;DR:</strong> a small draft model proposes several tokens; the big model verifies them in one parallel pass.</p>
+            <p>Provably the same output distribution, but fewer expensive forward passes &mdash; a major latency win. EAGLE-2/3 are the dominant production variants in 2026.</p>
+            <p class="tech__metric"><a href="https://arxiv.org/abs/2211.17192" rel="noopener">arXiv:2211.17192 &rarr;</a></p>
+          </article>
+
+          <article class="tech" aria-labelledby="p-mla">
+            <h3 id="p-mla">Multi-head Latent Attention <span class="tech__src">DeepSeek-V2/V3, 2024</span></h3>
+            <p><strong>TL;DR:</strong> compress keys/values into a low-rank <em>latent</em> before caching, instead of sharing heads (GQA).</p>
+            <p>Shrinks the KV cache dramatically while keeping quality, enabling long context at lower memory. The reason the KV-cache formula doesn&rsquo;t apply cleanly to DeepSeek models.</p>
+            <p class="tech__metric"><a href="https://arxiv.org/abs/2405.04434" rel="noopener">arXiv:2405.04434 &rarr;</a></p>
+          </article>
+
+          <article class="tech" aria-labelledby="p-radix">
+            <h3 id="p-radix">RadixAttention / SGLang <span class="tech__src">Zheng et&nbsp;al., 2024</span></h3>
+            <p><strong>TL;DR:</strong> keep cached KV prefixes in a <em>radix tree</em> so any shared prefix is reused automatically.</p>
+            <p>Turns overlapping system prompts, few-shot preambles, and multi-turn history into cache hits &mdash; large throughput gains for agents and RAG.</p>
+            <p class="tech__metric"><a href="https://arxiv.org/abs/2312.07104" rel="noopener">arXiv:2312.07104 &rarr;</a></p>
+          </article>
+
+          <article class="tech" aria-labelledby="p-lora">
+            <h3 id="p-lora">LoRA &amp; QLoRA <span class="tech__src">Hu et&nbsp;al., 2021; Dettmers et&nbsp;al., 2023</span></h3>
+            <p><strong>TL;DR:</strong> freeze the base model and train tiny low-rank adapters; QLoRA does it on a 4-bit-quantized base.</p>
+            <p>Fine-tune large models on a single GPU with a fraction of the memory &mdash; how I adapt open models (Llama, Gemma, DeBERTa) for function calling and domain tasks.</p>
+            <p class="tech__metric"><a href="https://arxiv.org/abs/2305.14314" rel="noopener">arXiv:2305.14314 &rarr;</a></p>
+          </article>
+
+        </div>
+        <p class="lab-copy lab-copy--foot">
+          Want the mechanics rather than the citations? The
+          <a href="/inference/">Inference Lab</a> visualizes the KV cache filling in real time and lets
+          you size any model&rsquo;s cache yourself.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <p><a href="/">&larr; Back to home</a> &middot; &copy; 2021&ndash;<span id="year">2026</span> Jorge Grisman</p>
+      <p class="site-footer__note">Built with vanilla HTML, CSS &amp; Canvas. No trackers.</p>
+    </div>
+  </footer>
+
+  <script src="/assets/js/main.js" defer></script>
+  <script src="/assets/js/deepdives.js" defer></script>
+</body>
+</html>
