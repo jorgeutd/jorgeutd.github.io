@@ -50,7 +50,8 @@
     "sameAs": [
       "https://github.com/jorgeutd",
       "https://www.linkedin.com/in/jorge-lopez-grisman",
-      "https://twitter.com/jorge_utd"
+      "https://twitter.com/jorge_utd",
+      "https://huggingface.co/Jorgeutd"
     ]
   }
   </script>
@@ -198,8 +199,55 @@
       </div>
     </section>
 
+    <!-- OPEN SOURCE (HUGGING FACE) -->
+    <section class="section" id="opensource" aria-labelledby="oss-title">
+      <div class="container">
+        <h2 class="section__title" id="oss-title">Open-source on Hugging Face</h2>
+        <p class="lab-copy">
+          I&rsquo;ve published open models since the early days of the Hub &mdash; fine-tuned transformers
+          for NER, text and emotion classification, summarization, and few-shot learning with SetFit.
+          A selection of my <a href="https://huggingface.co/Jorgeutd" rel="noopener">8 public models</a>:
+        </p>
+        <ul class="cards" role="list">
+          <li class="card">
+            <h3 class="card__title"><a href="https://huggingface.co/Jorgeutd/setfit-bge-small-v1.5-sst2-50-shot" rel="noopener">setfit-bge-small-v1.5-sst2</a></h3>
+            <p class="card__desc">Few-shot sentiment classification (SST-2) with SetFit on <code>bge-small</code> &mdash; strong accuracy from just 50 shots per class.</p>
+            <p class="card__tags"><span>SetFit</span><span>few-shot</span><span>text-classification</span></p>
+          </li>
+          <li class="card">
+            <h3 class="card__title"><a href="https://huggingface.co/Jorgeutd/bert-large-uncased-finetuned-ner" rel="noopener">bert-large-uncased-finetuned-ner</a></h3>
+            <p class="card__desc">Named-entity recognition fine-tune of BERT-large (~0.3B params).</p>
+            <p class="card__tags"><span>NER</span><span>token-classification</span><span>BERT</span></p>
+          </li>
+          <li class="card">
+            <h3 class="card__title"><a href="https://huggingface.co/Jorgeutd/sagemaker-roberta-base-emotion" rel="noopener">sagemaker-roberta-base-emotion</a></h3>
+            <p class="card__desc">RoBERTa fine-tuned for emotion classification, trained on AWS SageMaker.</p>
+            <p class="card__tags"><span>emotion</span><span>RoBERTa</span><span>SageMaker</span></p>
+          </li>
+          <li class="card">
+            <h3 class="card__title"><a href="https://huggingface.co/Jorgeutd/bert-base-uncased-ade-Ade-corpus-v2" rel="noopener">bert-base-uncased-ade-corpus-v2</a></h3>
+            <p class="card__desc">Adverse-drug-event detection &mdash; a healthcare-oriented text classifier.</p>
+            <p class="card__tags"><span>healthcare</span><span>text-classification</span></p>
+          </li>
+          <li class="card">
+            <h3 class="card__title"><a href="https://huggingface.co/Jorgeutd/distilbart-cnn-12-6-finetuned-xsum" rel="noopener">distilbart-cnn-12-6-finetuned-xsum</a></h3>
+            <p class="card__desc">Abstractive summarization fine-tune of DistilBART on XSum.</p>
+            <p class="card__tags"><span>summarization</span><span>DistilBART</span></p>
+          </li>
+          <li class="card">
+            <h3 class="card__title"><a href="https://huggingface.co/Jorgeutd/albert-base-v2-finetuned-ner" rel="noopener">albert-base-v2-finetuned-ner</a></h3>
+            <p class="card__desc">Parameter-efficient NER with ALBERT-base.</p>
+            <p class="card__tags"><span>NER</span><span>ALBERT</span></p>
+          </li>
+        </ul>
+        <p class="lab-copy" style="margin-top:1.25rem;">
+          <a class="btn btn--ghost" href="https://huggingface.co/Jorgeutd" rel="noopener">View all models on Hugging Face &rarr;</a>
+        </p>
+      </div>
+    </section>
+
     <!-- INFERENCE LAB CALLOUT -->
-    <section class="section" id="lab" aria-labelledby="lab-cta-title">
+    <section class="section section--alt" id="lab" aria-labelledby="lab-cta-title">
       <div class="container">
         <div class="lab-cta">
           <div class="lab-cta__text">
@@ -223,7 +271,7 @@
     </section>
 
     <!-- SKILLS -->
-    <section class="section section--alt" id="skills" aria-labelledby="skills-title">
+    <section class="section" id="skills" aria-labelledby="skills-title">
       <div class="container">
         <h2 class="section__title" id="skills-title">Skills</h2>
         <div class="skills">
@@ -269,7 +317,7 @@
     </section>
 
     <!-- EXPERIENCE -->
-    <section class="section" id="experience" aria-labelledby="experience-title">
+    <section class="section section--alt" id="experience" aria-labelledby="experience-title">
       <div class="container">
         <h2 class="section__title" id="experience-title">Career highlights</h2>
         <ol class="timeline" role="list">
@@ -312,7 +360,7 @@
     </section>
 
     <!-- CONTACT -->
-    <section class="section section--alt" id="contact" aria-labelledby="contact-title">
+    <section class="section" id="contact" aria-labelledby="contact-title">
       <div class="container contact">
         <h2 class="section__title" id="contact-title">Let&rsquo;s connect</h2>
         <p class="contact__lede">Building something in agents or on-device inference? I&rsquo;d like to hear about it.</p>
@@ -333,6 +381,12 @@
             <a class="btn btn--ghost" href="https://twitter.com/jorge_utd" rel="noopener">
               <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.9 1.2h3.68l-8.04 9.19L24 22.8h-7.4l-5.8-7.58-6.63 7.58H.48l8.6-9.83L0 1.2h7.6l5.24 6.93L18.9 1.2Zm-1.29 19.4h2.04L6.48 3.3H4.3l13.31 17.3Z"/></svg>
               X / Twitter
+            </a>
+          </li>
+          <li>
+            <a class="btn btn--ghost" href="https://huggingface.co/Jorgeutd" rel="noopener">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="10.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="10.5" r="1.3" fill="currentColor"/><path d="M8 14c1 1.3 2.4 2 4 2s3-.7 4-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              Hugging Face
             </a>
           </li>
         </ul>
