@@ -124,7 +124,7 @@
             <tbody>
               <tr><td>Classification / intent</td><td>precision, recall, F1, AUROC/AUPRC, calibration, confusion by class</td><td>transfer/deflection rate, cost of error</td></tr>
               <tr><td>RAG</td><td>faithfulness, answer relevancy, context precision/recall, citation correctness, hallucination rate</td><td>handle time, self-serve rate</td></tr>
-              <tr><td>Agents / tool use</td><td>tool-selection accuracy, tool-argument accuracy, task completion, structured-output validity, steps/looping</td><td>automation rate, $ / task</td></tr>
+              <tr><td>Agents / tool use</td><td>tool-selection accuracy, tool-argument accuracy, task completion, structured-output validity, <strong>pass^k</strong> (consistency across k trials)</td><td>automation rate, $ / task</td></tr>
               <tr><td>Speech (ASR)</td><td>WER / CER, real-time factor, timestamp accuracy</td><td>edit rate, capture time saved</td></tr>
               <tr><td>Summaries / generation</td><td>faithfulness (LLM-as-judge), relevance, format validity</td><td>review/accept rate</td></tr>
               <tr><td>Safety</td><td>jailbreak / prompt-injection pass rate, toxicity, PII leakage</td><td>incidents avoided</td></tr>
@@ -146,10 +146,11 @@
         </ul>
         <p class="lab-copy" style="margin-top:1rem">How I keep it honest:</p>
         <ul class="tight" style="color:var(--text-muted)">
-          <li><strong>Anchor to humans:</strong> measure judge&ndash;human agreement (e.g., Cohen&rsquo;s &kappa;) on a sample; align rubrics until agreement is acceptable, then let the judge scale.</li>
-          <li><strong>Constrain the task:</strong> pairwise comparison and rubric-scored booleans are more reliable than free-form 1&ndash;10 scores.</li>
-          <li><strong>Control for bias:</strong> randomize answer order; strip length cues; avoid judging a model with itself where possible.</li>
-          <li><strong>Keep humans in the loop</strong> for high-stakes and borderline cases; feed their adjudications back into the rubric.</li>
+          <li><strong>Report Cohen&rsquo;s &kappa;, not raw agreement.</strong> A 2026 large-scale study of 21 judges found raw exact-match overstates chance-corrected discrimination by <strong>33&ndash;41 points</strong> (&ldquo;kappa deflation&rdquo;); a judge&ndash;human &kappa; of ~0.6&ndash;0.8 is the acceptable-to-strong band for shipping.</li>
+          <li><strong>Anchor to humans, then scale.</strong> Collect human corrections and align rubrics until &kappa; holds (tools like LangSmith Align Evals and MLflow judge alignment make this systematic), then let the judge run.</li>
+          <li><strong>Constrain the task:</strong> pairwise comparison and criterion-separated rubric booleans beat free-form 1&ndash;10 scores; watch for transitivity violations (A&gt;B, B&gt;C, C&gt;A).</li>
+          <li><strong>Control for bias:</strong> randomize option order (position bias persists even in high-consistency judges &mdash; the &ldquo;consistency&ndash;bias paradox&rdquo;), use a <em>cross-family</em> judge (avoid self-preference); verbosity bias is much smaller on 2026 frontier judges than the 2023 literature suggested, but don&rsquo;t assume it&rsquo;s gone.</li>
+          <li><strong>Keep humans in the loop</strong> for high-stakes/borderline cases; feed adjudications back into the rubric &mdash; but beware rubric-induced preference drift from over-editing.</li>
         </ul>
       </div>
     </section>
@@ -187,7 +188,8 @@
               <tr><td>MLflow</td><td>Eval + registry</td><td>unifies DeepEval/RAGAS/Phoenix judges; judge alignment; model registry lineage</td></tr>
               <tr><td>W&amp;B Weave</td><td>Observability + eval</td><td>trace trees, golden-set evals, live scoring + human feedback loops</td></tr>
               <tr><td>Langfuse</td><td>Observability</td><td>open-source, self-hostable tracing + event logging</td></tr>
-              <tr><td>LangSmith</td><td>Observability</td><td>deep tracing + debugging for LangChain/LangGraph apps</td></tr>
+              <tr><td>LangSmith</td><td>Observability + eval</td><td>tracing + agent-trajectory eval; Align Evals for systematic judge&ndash;human calibration</td></tr>
+              <tr><td>TruLens</td><td>Eval + tracing</td><td>OpenTelemetry-native span-level evals; feedback functions for RAG/agents</td></tr>
               <tr><td>Arize Phoenix</td><td>Observability</td><td>embedding-based drift detection; hallucination scoring</td></tr>
               <tr><td>Helicone</td><td>Monitoring</td><td>per-call logs/metrics, cost + latency alerting</td></tr>
               <tr><td>Giskard</td><td>Governance / safety</td><td>bias/fairness auditing with non-technical stakeholder review</td></tr>
@@ -198,10 +200,26 @@
       </div>
     </section>
 
-    <!-- 7. How I apply it -->
-    <section class="section" id="applied" aria-labelledby="applied-title">
+    <!-- 7. Research frontier -->
+    <section class="section" id="frontier" aria-labelledby="frontier-title">
       <div class="container">
-        <h2 class="section__title" id="applied-title">7 &middot; How I apply this in practice</h2>
+        <h2 class="section__title" id="frontier-title">7 &middot; The 2026 research frontier</h2>
+        <p class="lab-copy">Three shifts are reshaping how serious teams evaluate AI right now:</p>
+        <ul class="tight" style="color:var(--text-muted); max-width:76ch">
+          <li><strong>Agentic evaluation &mdash; score the trace, not just the answer.</strong>
+            <a href="https://arxiv.org/abs/2410.10934" rel="noopener">Agent-as-a-Judge</a> (Zhuge et&nbsp;al., ICML&nbsp;2025) uses an agent to give step-by-step feedback over an entire task-solving trajectory and matches human-level reliability on code tasks (DevAI) far more cheaply; <em>Multi-Agent-as-Judge</em> (MAJ-EVAL, ACL&nbsp;2026) runs debates between persona agents to better align with domain experts and cut single-judge bias.</li>
+          <li><strong>Judge reliability is now a measurement science.</strong> A 2026 audit of 21 judges (<a href="https://arxiv.org/abs/2606.19544" rel="noopener">&ldquo;Reliability without Validity&rdquo;</a>) shows raw agreement inflates discrimination by 33&ndash;41&nbsp;points, judge rankings shift by up to 14 places across benchmarks (JudgeBench discriminates ~4.5&times; more sharply than MT-Bench), and high test&ndash;retest reliability can hide severe position bias. The lesson: validate the judge as an instrument (report &kappa;, run a minimum-viable-validation protocol) before you trust its scores.</li>
+          <li><strong>Reliability benchmarks for agents.</strong>
+            <a href="https://arxiv.org/abs/2406.12045" rel="noopener">&tau;-bench</a> and
+            <a href="https://arxiv.org/abs/2506.07982" rel="noopener">&tau;&sup2;-bench</a> (dual-control) &mdash; plus &tau;-Knowledge (RAG over unstructured KBs) and &tau;-Voice &mdash; grade tool-agent-user conversations against the final database state and popularized <strong>pass^k</strong>: the probability of succeeding across <em>k</em> independent trials. Frontier agents still drop sharply as k grows, which is exactly why I gate on consistency, not a lucky single-shot demo.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 8. How I apply it -->
+    <section class="section section--alt" id="applied" aria-labelledby="applied-title">
+      <div class="container">
+        <h2 class="section__title" id="applied-title">8 &middot; How I apply this in practice</h2>
         <ul class="tight" style="color:var(--text-muted); max-width:74ch">
           <li><strong>Email automation:</strong> DeepEval for tool-selection + argument correctness and task completion, wired into CI as a release gate; classifier accuracy with drift alerts.</li>
           <li><strong>Insurance assistant:</strong> intent F1 + calibration with temporal splits and confusion analysis; safety red-teaming for prompt injection; transfer-rate as the business truth.</li>
