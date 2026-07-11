@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>document.documentElement.classList.remove('no-js');document.documentElement.classList.add('js');</script>
+  <meta name="color-scheme" content="dark" />
+  <title>System Design &amp; Architecture — Production AI Case Studies · Jorge Grisman</title>
+  <meta name="description" content="Principal-level architecture case studies of production AI systems I've designed and shipped: offline-first on-device Sales AI, enterprise multi-agent email automation, an AI release/eval/observability control plane, an insurance virtual assistant, and a healthcare RAG assistant — with scale, trade-offs, failure modes, evals, and business outcomes." />
+  <meta name="author" content="Jorge Lopez Grisman" />
+  <meta name="theme-color" content="#0b0f1a" />
+  <link rel="canonical" href="https://jorgeutd.github.io/systems/" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Jorge Grisman" />
+  <meta property="og:title" content="System Design &amp; Architecture — Production AI Case Studies" />
+  <meta property="og:description" content="Architecture case studies of production AI systems: scale, trade-offs, failure modes, evals, and business outcomes." />
+  <meta property="og:url" content="https://jorgeutd.github.io/systems/" />
+  <meta property="og:image" content="https://jorgeutd.github.io/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@jorge_utd" />
+  <meta name="twitter:image" content="https://jorgeutd.github.io/og-image.png" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate icon" href="/favicon.png" type="image/png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <link rel="stylesheet" href="/assets/css/inference.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "System Design & Architecture — Production AI Case Studies",
+    "author": { "@type": "Person", "name": "Jorge Lopez Grisman", "url": "https://jorgeutd.github.io/" },
+    "about": ["system design", "AI architecture", "multi-agent systems", "RAG", "on-device inference", "MLOps"]
+  }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="site-header">
+    <nav class="nav" aria-label="Primary">
+      <a class="nav__brand" href="/" aria-label="Jorge Grisman — home">
+        <span class="nav__brand-mark" aria-hidden="true">JG</span>
+        <span class="nav__brand-text">Jorge Grisman</span>
+      </a>
+      <button class="nav__toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Open menu">
+        <span class="nav__toggle-bar" aria-hidden="true"></span>
+      </button>
+      <ul class="nav__menu" id="nav-menu">
+        <li><a href="/#projects">Projects</a></li>
+        <li><a href="/systems/" aria-current="page">Systems</a></li>
+        <li><a href="/inference/">Inference Lab</a></li>
+        <li><a href="/deep-dives/">Deep Dives</a></li>
+        <li><a href="/evals/">Evals</a></li>
+        <li><a href="/#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="lab-hero" aria-labelledby="sys-title">
+      <div class="hero__bg" aria-hidden="true"><canvas class="hero-net" data-net></canvas></div>
+      <div class="container lab-hero__inner">
+        <p class="hero__eyebrow">System Design &amp; Architecture</p>
+        <h1 id="sys-title" class="lab-hero__title">Systems I&rsquo;ve designed and shipped</h1>
+        <p class="lab-hero__lede">
+          Five production AI systems, told the way I&rsquo;d defend them in a principal-level design
+          review: the real problem, the scale that shaped the architecture, the decisions that
+          mattered (and the ones I rejected), how they fail and recover, how they&rsquo;re evaluated,
+          and the business outcome. Diagrams are simplified for clarity, not marketing.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="cases" aria-label="Architecture case studies">
+      <div class="container">
+        <ul class="subnav" aria-label="Jump to a case study">
+          <li><a href="#ondevice">On-device Sales AI</a></li>
+          <li><a href="#email">Multi-agent email automation</a></li>
+          <li><a href="#controlplane">AI release &amp; eval control plane</a></li>
+          <li><a href="#assistant">Insurance virtual assistant</a></li>
+          <li><a href="#rag">Healthcare RAG</a></li>
+        </ul>
+
+        <!-- 1. On-device Sales AI -->
+        <article class="case" id="ondevice">
+          <h3>1 &middot; Offline-first, on-device Sales AI</h3>
+          <p class="case__org">Grainger &middot; iOS · Apple Silicon · llama.cpp / whisper.cpp</p>
+          <ul class="case-meta">
+            <li>3,000+ sellers</li><li>on-device only</li><li>~$1.2M/yr cloud saved</li><li>50k+ hrs/yr</li>
+          </ul>
+          <p class="lab-copy"><strong>Problem.</strong> Field sellers need real-time visit capture and
+          recommendations with no reliable connectivity, on customer sites, without shipping sensitive
+          conversations to the cloud &mdash; and cloud STT+LLM was costing ~$1.2M/yr.</p>
+<pre class="ascii" aria-label="On-device Sales AI architecture diagram">
+ mic ─▶ <b>VAD</b> ─▶ <b>whisper.cpp</b> (streaming ASR) ─▶ transcript buffer
+                        │  partial + final          (stable │ unstable)
+                        ▼
+                 prompt builder ──▶ <b>llama.cpp</b> (GGUF LLM, Metal)
+                 (context mgmt)      + <i>GBNF grammar</i> → strict JSON
+                        │                        │
+                        ▼                        ▼
+                 structured visit summary + next-best actions
+                        │
+                        ▼
+                 <b>human review UI</b> ─▶ local store (Core Data) ─▶ sync ▲ (when online)
+                                                                 │
+                        artifact delivery ◀── checksum + rollback ┘ (model updates)
+</pre>
+          <p class="case__label">Key decisions &amp; trade-offs</p>
+          <ul class="tight">
+            <li><strong>On-device vs cloud:</strong> chose local for cost, latency, offline, and privacy; accepted a smaller quantized model (GGUF Q4/Q5) and a benchmarking burden across device tiers.</li>
+            <li><strong>GBNF grammar-constrained decoding:</strong> guarantees schema-valid JSON without a fragile parser or retries &mdash; the reliability unlock for structured summaries.</li>
+            <li><strong>Swift concurrency isolation:</strong> ASR + LLM run off the MainActor on dedicated actors; UI stays responsive; explicit cancellation when a visit ends.</li>
+            <li><strong>Rejected:</strong> a always-cloud fallback (defeats the offline goal) and a larger model (thermal/battery/memory budget on iPhone).</li>
+          </ul>
+          <p class="case__label">Reliability &amp; failure modes</p>
+          <ul class="tight">
+            <li>Memory/thermal budgeting; unload the model under pressure; cap context window and manage the KV cache.</li>
+            <li>Corrupted/al partial model download → checksum verify + atomic swap + rollback to last-good artifact.</li>
+            <li>App backgrounded / recording cancelled mid-stream → flush stable transcript, discard unstable tail.</li>
+          </ul>
+          <p class="case__label">Evaluation</p>
+          <ul class="tight">
+            <li>ASR: WER/CER and real-time factor on held-out field audio; LLM: structured-output validity + summary faithfulness via LLM-as-judge, plus cloud-vs-device parity benchmarks gating each model bump.</li>
+          </ul>
+          <p class="case__label">Outcome</p>
+          <p class="lab-copy">Eliminated ~$1.2M/yr in cloud inference and saved 50,000+ hrs/yr, with production-grade structured reliability offline.</p>
+        </article>
+
+        <!-- 2. Multi-agent email automation -->
+        <article class="case" id="email">
+          <h3>2 &middot; Enterprise multi-agent email automation</h3>
+          <p class="case__org">Grainger &middot; LangGraph · Azure OpenAI · FastAPI · Kafka · MCP</p>
+          <ul class="case-meta">
+            <li>48,000+ emails/day</li><li>~2.5s response</li><li>&minus;85% manual</li><li>same-day fulfillment</li>
+          </ul>
+          <p class="lab-copy"><strong>Problem.</strong> Tens of thousands of inbound order emails/day were
+          processed by hand, blocking same-day fulfillment. Extract intent + attachments, act on order /
+          customer / fulfillment systems (reads <em>and</em> writes), with auditability and no duplicate actions.</p>
+<pre class="ascii" aria-label="Multi-agent email automation architecture diagram">
+ email ─▶ ingress ─▶ <b>Kafka</b> (partition by account) ─▶ consumer group (scales out)
+                                                   │
+              ┌────────────────────────────────────┘
+              ▼
+        attachment/doc classifier (<i>EfficientNetV2</i>, 94.9%)
+              ▼
+        <b>LangGraph router</b> ──▶ specialized agents: [order] [customer] [fulfillment]
+              │                          │  tool calls (typed)
+              │                          ▼
+              │                   <b>MCP tool servers</b> ─▶ enterprise APIs (read/write)
+              ▼
+        structured output ─▶ confidence gate ──low──▶ <b>human review</b>
+              │ high                                        │
+              ▼                                             ▼
+        result topic ─▶ order lifecycle        retry topic ─▶ <b>DLQ</b> (poison msgs)
+              (idempotency keys, distributed tracing throughout)
+</pre>
+          <p class="case__label">Key decisions &amp; trade-offs</p>
+          <ul class="tight">
+            <li><strong>Agents vs deterministic workflow:</strong> a router + a few <em>specialized</em> agents, not an open-ended swarm &mdash; bounded tool permissions, predictable cost, debuggable traces.</li>
+            <li><strong>&ldquo;Exactly-once&rdquo; is a lie; idempotency is real:</strong> at-least-once Kafka delivery + idempotency keys on every write tool, so duplicate/redelivered emails never double-book an order.</li>
+            <li><strong>Confidence gate → human-in-the-loop:</strong> low-confidence extractions escalate instead of acting; keeps write operations safe.</li>
+            <li><strong>Rejected:</strong> synchronous request/response (couldn&rsquo;t absorb bursts) and one god-agent (unbounded tool access, untestable).</li>
+          </ul>
+          <p class="case__label">Reliability &amp; failure modes</p>
+          <ul class="tight">
+            <li>Partition by account for ordering per customer; consumer-group scaling for throughput; backpressure via lag monitoring.</li>
+            <li>Retry topics with capped attempts → DLQ; compensation actions for partially-completed workflows; tool timeouts + circuit breakers on enterprise APIs.</li>
+          </ul>
+          <p class="case__label">Evaluation</p>
+          <ul class="tight">
+            <li>DeepEval for tool-selection + tool-argument correctness and task completion; attachment-classifier accuracy tracked with drift alerts; prompt/model versions pinned to eval runs.</li>
+          </ul>
+          <p class="case__label">Outcome</p>
+          <p class="lab-copy">48,000+ emails/day at ~2.5s, manual handling down ~85%, enabling same-day order fulfillment.</p>
+        </article>
+
+        <!-- 3. Control plane -->
+        <article class="case" id="controlplane">
+          <h3>3 &middot; AI release, evaluation &amp; observability control plane</h3>
+          <p class="case__org">Grainger &middot; S3 · MLflow · Next.js · GitOps / Argo CD</p>
+          <ul class="case-meta">
+            <li>weeks → days releases</li><li>cloud + on-device</li><li>multi-team</li>
+          </ul>
+          <p class="lab-copy"><strong>Problem.</strong> Multiple AI teams needed one trusted way to decide
+          whether a model, prompt, workflow, or on-device artifact was <em>safe to ship</em> &mdash; with
+          governance that didn&rsquo;t collapse into bureaucracy.</p>
+<pre class="ascii" aria-label="AI release and evaluation control plane architecture diagram">
+  <b>CONTROL PLANE</b>                                   <b>DATA PLANE</b>
+  ┌───────────────────────────────────┐           ┌──────────────────────┐
+  │ artifact upload ─▶ S3 (immutable)  │           │ serving (cloud) +    │
+  │        │  + checksum               │  promote  │ on-device artifacts  │
+  │        ▼                           │ ────────▶ │                      │
+  │ registry (metadata DB) ─▶ eval svc │           └──────────────────────┘
+  │        │        golden sets, replay,│                    ▲
+  │        │        <i>LLM-as-judge</i>, cloud-│  rollback ─────────┘
+  │        ▼        vs-device benchmark │
+  │ MLflow traces ─▶ approval gate ─▶ GitOps deploy (canary)
+  │        └────────▶ dashboards (Next.js) + audit trail
+  └───────────────────────────────────┘
+</pre>
+          <p class="case__label">Key decisions &amp; trade-offs</p>
+          <ul class="tight">
+            <li><strong>Control plane vs data plane:</strong> the platform decides and records; it never sits in the serving hot path.</li>
+            <li><strong>Immutable, checksum-governed artifacts:</strong> promotion moves a verified hash between environments &mdash; reproducible, tamper-evident, and safe to roll back.</li>
+            <li><strong>Release gates as thresholds, not vibes:</strong> eval scores + human approval gate promotion; the same gate defines the rollback trigger.</li>
+            <li><strong>Avoiding bureaucracy:</strong> gates are automated and fast; humans approve only what the evals flag as borderline.</li>
+          </ul>
+          <p class="case__label">Evaluation &amp; observability</p>
+          <ul class="tight">
+            <li>Versioned datasets + metrics; replay tests; LLM-as-judge with human-calibrated rubrics; every score is traceable to the exact prompt + model + dataset version (lineage).</li>
+          </ul>
+          <p class="case__label">Outcome</p>
+          <p class="lab-copy">Cut release cycles from weeks to days and gave product + engineering a shared, auditable basis for what ships.</p>
+        </article>
+
+        <!-- 4. Insurance virtual assistant -->
+        <article class="case" id="assistant">
+          <h3>4 &middot; Insurance virtual assistant (voice + chat)</h3>
+          <p class="case__org">GEICO &middot; LangGraph · Azure OpenAI · fine-tuned Llama 3.1 · DeBERTa · MCP</p>
+          <ul class="case-meta">
+            <li>voice (IVR) + chat</li><li>400+ intents</li><li>read + write ops</li><li>&minus;14.7% transfers</li>
+          </ul>
+          <p class="lab-copy"><strong>Problem.</strong> Personalized, open-ended support for claims, billing,
+          and policy servicing across IVR and chat &mdash; including <em>consequential writes</em>
+          (postpone payment, add a vehicle) &mdash; safely and at low latency.</p>
+<pre class="ascii" aria-label="Insurance virtual assistant architecture diagram">
+ IVR / chat ─▶ session state (<b>Redis</b>) ─▶ safety in: <i>Prompt Guard</i> + content filter
+                        │
+                        ▼
+        intent classifier (<b>DeBERTa v3</b>, 400+ intents, calibrated)  ──┐
+                        │                                                 │ hybrid
+                        ▼                                                 ▼
+                <b>LangGraph router</b> ─▶ function-calling LLM (fine-tuned Llama 3.1)
+                        │                         │ tool calls
+                        ▼                         ▼
+                read tools ◀──────────── <b>MCP tools</b> (15+) ──▶ write tools
+                (claims/policy/billing)     │  server-side authz    │ require confirmation
+                        │                    │                       │  + idempotency
+                        ▼                    ▼                       ▼
+                grounded answer     safety out (filter)      enterprise APIs (txn)
+                        └────────── low confidence / risk ─▶ <b>human escalation</b>
+</pre>
+          <p class="case__label">Key decisions &amp; trade-offs</p>
+          <ul class="tight">
+            <li><strong>Hybrid intent routing:</strong> a calibrated DeBERTa classifier for the 400+ known intents (cheap, fast, measurable) + LLM routing for the long tail &mdash; not one giant prompt.</li>
+            <li><strong>Reads are cheap, writes are consequential:</strong> write tools require explicit user confirmation, server-side authorization (never trust model-supplied identity), idempotency keys, and clear transaction boundaries.</li>
+            <li><strong>Safety as layers:</strong> Prompt Guard + content filtering on input and output; unsafe/low-confidence paths escalate to a human.</li>
+            <li><strong>Rejected:</strong> autonomous writes without confirmation (unacceptable risk) and a pure-LLM router (worse latency, weaker guarantees than a fine-tuned classifier for known intents).</li>
+          </ul>
+          <p class="case__label">Evaluation</p>
+          <ul class="tight">
+            <li>Intent F1 (95.7%) with confusion analysis and temporal splits; tool-selection + argument accuracy; task completion; transfer-rate and callback deltas as the business metrics; safety red-teaming for jailbreaks/prompt injection.</li>
+          </ul>
+          <p class="case__label">Outcome</p>
+          <p class="lab-copy">Live-agent transfers down 14.7% in two months (~$2.7M/yr), callbacks improved 13.6%.</p>
+        </article>
+
+        <!-- 5. Healthcare RAG -->
+        <article class="case" id="rag">
+          <h3>5 &middot; Healthcare RAG &amp; benefits assistant</h3>
+          <p class="case__org">Quantum Health &middot; AWS Textract · Bedrock · hybrid retrieval · FastAPI</p>
+          <ul class="case-meta">
+            <li>10M+ members</li><li>&minus;42s handle time</li><li>+6% calls/agent</li><li>tenant-isolated</li>
+          </ul>
+          <p class="lab-copy"><strong>Problem.</strong> Call-center agents needed grounded, cited answers from
+          frequently-changing health-plan documents &mdash; with strict per-plan permissions and no hallucinated
+          benefits.</p>
+<pre class="ascii" aria-label="Healthcare RAG architecture diagram">
+ plan docs ─▶ validate + scan ─▶ <b>Textract/Unstructured</b> OCR ─▶ clean/dedupe ─▶ classify
+                                                                              │
+   chunk + metadata (plan, tenant, effective-date) ─▶ embed ─▶ <b>vector index</b> + BM25
+                                                                              │
+ agent query ─▶ query rewrite ─▶ <b>hybrid retrieve</b> ─▶ <i>rerank</i> ─▶ context assembly
+                                        (permission + tenant filter)          │
+                                                                              ▼
+                             <b>Bedrock LLM</b> ─▶ grounded answer + <i>citations</i> ─▶ validate ─▶ agent UI
+                                                                              │
+                                                          eval + monitoring ◀─┘  (freshness / reindex)
+</pre>
+          <p class="case__label">Key decisions &amp; trade-offs</p>
+          <ul class="tight">
+            <li><strong>Hybrid retrieval (dense + BM25) + rerank:</strong> plan docs are keyword-heavy (codes, plan names); pure vector search missed exact matches.</li>
+            <li><strong>Permissions at retrieval time:</strong> tenant + plan filters are applied <em>before</em> the LLM sees context &mdash; isolation can&rsquo;t depend on the model behaving.</li>
+            <li><strong>Citations + response validation:</strong> answers must cite retrieved passages; unsupported claims are blocked to keep hallucination near zero.</li>
+            <li><strong>Freshness:</strong> plan documents change; ingestion supports delete + reindex so stale benefits never surface.</li>
+          </ul>
+          <p class="case__label">Evaluation</p>
+          <ul class="tight">
+            <li>RAGAS-style metrics &mdash; <strong>faithfulness</strong>, <strong>answer relevancy</strong>, <strong>context precision/recall</strong> &mdash; plus citation correctness and a curated golden set; retrieval P/R tracked as docs change.</li>
+          </ul>
+          <p class="case__label">Outcome</p>
+          <p class="lab-copy">Average handle time down 42s and +6% calls handled per agent; a sibling agentic email-triage workflow saved ~$1.5M/yr.</p>
+        </article>
+
+        <p class="lab-copy lab-copy--foot">
+          How I decide these are safe to ship &mdash; the metrics, LLM-as-judge caveats, and the 2026 tooling
+          &mdash; is on the <a href="/evals/">Evals</a> page. The mechanics of the inference layer live in the
+          <a href="/inference/">Inference Lab</a>.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <p><a href="/">&larr; Back to home</a> &middot; &copy; 2021&ndash;<span id="year">2026</span> Jorge Grisman</p>
+      <p class="site-footer__note">Diagrams simplified for clarity. No trackers.</p>
+    </div>
+  </footer>
+
+  <script src="/assets/js/main.js" defer></script>
+</body>
+</html>

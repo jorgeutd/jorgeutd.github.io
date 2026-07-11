@@ -164,8 +164,10 @@
 
     var commands = [
       { label: "Home", href: "/", grp: "Page" },
+      { label: "Systems (architecture case studies)", href: "/systems/", grp: "Page" },
       { label: "Inference Lab", href: "/inference/", grp: "Page" },
       { label: "Papers & Deep Dives", href: "/deep-dives/", grp: "Page" },
+      { label: "Evals (how I evaluate AI systems)", href: "/evals/", grp: "Page" },
       { label: "About", href: sec("about"), grp: "Section" },
       { label: "Featured projects", href: sec("projects"), grp: "Section" },
       { label: "Open-source (Hugging Face)", href: sec("opensource"), grp: "Section" },

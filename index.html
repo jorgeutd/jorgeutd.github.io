@@ -69,12 +69,11 @@
         <span class="nav__toggle-bar" aria-hidden="true"></span>
       </button>
       <ul class="nav__menu" id="nav-menu">
-        <li><a href="#about">About</a></li>
         <li><a href="#projects">Projects</a></li>
-        <li><a href="#skills">Skills</a></li>
-        <li><a href="#experience">Experience</a></li>
+        <li><a href="/systems/">Systems</a></li>
         <li><a href="/inference/">Inference Lab</a></li>
         <li><a href="/deep-dives/">Deep Dives</a></li>
+        <li><a href="/evals/">Evals</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
     </nav>
@@ -251,19 +250,21 @@
       <div class="container">
         <div class="lab-cta">
           <div class="lab-cta__text">
-            <h2 class="section__title" id="lab-cta-title">Interactive: Inference Lab</h2>
+            <h2 class="section__title" id="lab-cta-title">Go deeper: systems, inference &amp; evals</h2>
             <p>
-              An interactive, technically accurate visualization of the transformer
-              <strong>KV cache</strong> and the state-of-the-art serving techniques that make
-              LLMs cheap to run at scale &mdash; PagedAttention, continuous batching, speculative
-              decoding, GQA/MQA, prefix caching, and KV quantization. Watch the cache fill in
-              real time and size any model&rsquo;s cache yourself. The <strong>Papers &amp; Deep Dives</strong>
-              page adds a live decoding playground (temperature, top-k, top-p) and concise explainers of
-              the research behind modern inference.
+              Beyond the r&eacute;sum&eacute; bullets: <strong>Systems</strong> walks the architecture of five
+              production AI systems I&rsquo;ve shipped (scale, trade-offs, failure modes, outcomes). The
+              <strong>Inference Lab</strong> visualizes the KV cache and SOTA serving (PagedAttention,
+              speculative decoding, disaggregation) with a live memory calculator. <strong>Deep Dives</strong>
+              adds a decoding playground and positional-encoding heatmap plus cited paper explainers. And
+              <strong>Evals</strong> is my field guide to proving these systems are safe to ship. Press
+              <kbd>&#8984;K</kbd> anywhere to jump around.
             </p>
             <div class="hero__actions">
-              <a class="btn btn--primary" href="/inference/">Open the Inference Lab &rarr;</a>
-              <a class="btn btn--ghost" href="/deep-dives/">Papers &amp; Deep Dives &rarr;</a>
+              <a class="btn btn--primary" href="/systems/">System design case studies &rarr;</a>
+              <a class="btn btn--ghost" href="/inference/">Inference Lab &rarr;</a>
+              <a class="btn btn--ghost" href="/deep-dives/">Deep Dives &rarr;</a>
+              <a class="btn btn--ghost" href="/evals/">Evals &rarr;</a>
             </div>
           </div>
         </div>

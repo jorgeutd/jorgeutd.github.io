@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>document.documentElement.classList.remove('no-js');document.documentElement.classList.add('js');</script>
+  <meta name="color-scheme" content="dark" />
+  <title>How I Evaluate Production AI Systems — Evals, Observability &amp; Governance · Jorge Grisman</title>
+  <meta name="description" content="A principal-level field guide to evaluating production AI systems: evaluation vs observability vs monitoring, the offline-to-online continuum, metrics by system type, LLM-as-judge and its caveats, traceability/lineage, release gates, and the 2026 tooling landscape (DeepEval, RAGAS, W&B Weave, MLflow, Langfuse, Arize Phoenix, Giskard)." />
+  <meta name="author" content="Jorge Lopez Grisman" />
+  <meta name="theme-color" content="#0b0f1a" />
+  <link rel="canonical" href="https://jorgeutd.github.io/evals/" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Jorge Grisman" />
+  <meta property="og:title" content="How I Evaluate Production AI Systems" />
+  <meta property="og:description" content="Eval vs observability vs monitoring, metrics by system type, LLM-as-judge caveats, traceability, release gates, and the 2026 tooling landscape." />
+  <meta property="og:url" content="https://jorgeutd.github.io/evals/" />
+  <meta property="og:image" content="https://jorgeutd.github.io/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@jorge_utd" />
+  <meta name="twitter:image" content="https://jorgeutd.github.io/og-image.png" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate icon" href="/favicon.png" type="image/png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <link rel="stylesheet" href="/assets/css/inference.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "How I Evaluate Production AI Systems",
+    "author": { "@type": "Person", "name": "Jorge Lopez Grisman", "url": "https://jorgeutd.github.io/" },
+    "about": ["LLM evaluation", "RAG evaluation", "LLM-as-judge", "observability", "AI governance"]
+  }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="site-header">
+    <nav class="nav" aria-label="Primary">
+      <a class="nav__brand" href="/" aria-label="Jorge Grisman — home">
+        <span class="nav__brand-mark" aria-hidden="true">JG</span>
+        <span class="nav__brand-text">Jorge Grisman</span>
+      </a>
+      <button class="nav__toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Open menu">
+        <span class="nav__toggle-bar" aria-hidden="true"></span>
+      </button>
+      <ul class="nav__menu" id="nav-menu">
+        <li><a href="/#projects">Projects</a></li>
+        <li><a href="/systems/">Systems</a></li>
+        <li><a href="/inference/">Inference Lab</a></li>
+        <li><a href="/deep-dives/">Deep Dives</a></li>
+        <li><a href="/evals/" aria-current="page">Evals</a></li>
+        <li><a href="/#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="lab-hero" aria-labelledby="ev-title">
+      <div class="hero__bg" aria-hidden="true"><canvas class="hero-net" data-net></canvas></div>
+      <div class="container lab-hero__inner">
+        <p class="hero__eyebrow">Evaluation &amp; Governance</p>
+        <h1 id="ev-title" class="lab-hero__title">How I evaluate production AI systems</h1>
+        <p class="lab-hero__lede">
+          Shipping an AI feature is easy; knowing it&rsquo;s <em>safe to ship</em> &mdash; and staying sure as
+          models, prompts, and data drift &mdash; is the hard part. This is the field guide I use: what to
+          measure, how to judge it, and how to gate releases on it. The 2026 shift is <strong>traceability</strong>:
+          every score links back to the exact prompt, model, and dataset version that produced it.
+        </p>
+      </div>
+    </section>
+
+    <!-- 1. Three distinct things -->
+    <section class="section" id="triad" aria-labelledby="triad-title">
+      <div class="container">
+        <h2 class="section__title" id="triad-title">1 &middot; Evaluation &ne; observability &ne; monitoring</h2>
+        <p class="lab-copy">These get conflated constantly. They answer different questions and you need all three.</p>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Discipline</th><th>Answers</th><th>Examples</th></tr></thead>
+            <tbody>
+              <tr><td>Evaluation</td><td>Is the <em>output</em> good against a goal?</td><td>accuracy on a domain set, RAG faithfulness, hallucination rate on adversarial prompts, safety ratings</td></tr>
+              <tr><td>Observability</td><td><em>Why</em> did this behavior happen?</td><td>traces across chains/tools, prompt + context versions, per-step cost/latency, lineage</td></tr>
+              <tr><td>Monitoring</td><td>Is it <em>up, fast, and in budget</em> right now?</td><td>uptime, request/error rates, tail latency, token usage, cost thresholds, alerts</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="lab-copy">Rule of thumb: monitoring pages you at 3&nbsp;a.m.; observability tells you what broke; evaluation tells you whether the fix is actually better before it ships.</p>
+      </div>
+    </section>
+
+    <!-- 2. Offline to online -->
+    <section class="section section--alt" id="continuum" aria-labelledby="cont-title">
+      <div class="container">
+        <h2 class="section__title" id="cont-title">2 &middot; The offline &rarr; online continuum</h2>
+        <p class="lab-copy">Quality gates get progressively closer to real traffic. Nothing reaches users without passing the earlier stages.</p>
+<pre class="ascii" aria-label="Offline to online evaluation pipeline">
+ <b>golden set</b> ─▶ <b>regression</b> ─▶ <b>shadow</b> ─▶ <b>canary / A-B</b> ─▶ <b>production monitoring</b>
+ (curated,       (vs baseline,     (prod traffic,  (small % live,     (live metrics +
+  versioned)      block backslide)  no user impact)  guardrails)        <i>human-in-the-loop</i>)
+        │                                                                     │
+        └──────────────── feedback loop: prod failures become new golden cases ┘
+</pre>
+        <ul class="case-meta" style="margin-top:1rem">
+          <li>offline: fast, cheap, deterministic gates in CI</li>
+          <li>online: catches what offline can&rsquo;t &mdash; drift, real inputs, tail cases</li>
+        </ul>
+        <p class="lab-copy">The most valuable dataset you own is the one built from real production failures. Every incident should end with a new golden case so the same regression can never ship twice.</p>
+      </div>
+    </section>
+
+    <!-- 3. Metrics by system type -->
+    <section class="section" id="metrics" aria-labelledby="metrics-title">
+      <div class="container">
+        <h2 class="section__title" id="metrics-title">3 &middot; Metrics by system type</h2>
+        <p class="lab-copy">There is no single &ldquo;LLM score.&rdquo; The metric has to match what the system does &mdash; and always pair a <em>quality</em> metric with a <em>business</em> metric.</p>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>System</th><th>Core quality metrics</th><th>Paired business metric</th></tr></thead>
+            <tbody>
+              <tr><td>Classification / intent</td><td>precision, recall, F1, AUROC/AUPRC, calibration, confusion by class</td><td>transfer/deflection rate, cost of error</td></tr>
+              <tr><td>RAG</td><td>faithfulness, answer relevancy, context precision/recall, citation correctness, hallucination rate</td><td>handle time, self-serve rate</td></tr>
+              <tr><td>Agents / tool use</td><td>tool-selection accuracy, tool-argument accuracy, task completion, structured-output validity, steps/looping</td><td>automation rate, $ / task</td></tr>
+              <tr><td>Speech (ASR)</td><td>WER / CER, real-time factor, timestamp accuracy</td><td>edit rate, capture time saved</td></tr>
+              <tr><td>Summaries / generation</td><td>faithfulness (LLM-as-judge), relevance, format validity</td><td>review/accept rate</td></tr>
+              <tr><td>Safety</td><td>jailbreak / prompt-injection pass rate, toxicity, PII leakage</td><td>incidents avoided</td></tr>
+              <tr><td>Fraud / risk (classical)</td><td>precision@k, recall, PR-AUC, cost-sensitive threshold</td><td>$ loss prevented vs false-positive cost</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="lab-copy"><strong>RAGAS</strong> formalized the RAG four &mdash; faithfulness, answer relevancy, context precision, context recall (EACL 2024) &mdash; and most frameworks now expose them; <strong>DeepEval</strong> adds G-Eval, task completion, and tool-selection accuracy across single-turn, multi-turn, and agentic cases.</p>
+      </div>
+    </section>
+
+    <!-- 4. LLM-as-judge -->
+    <section class="section section--alt" id="judge" aria-labelledby="judge-title">
+      <div class="container">
+        <h2 class="section__title" id="judge-title">4 &middot; LLM-as-judge &mdash; powerful, but calibrate it</h2>
+        <p class="lab-copy">Using a strong model to score another model&rsquo;s output scales evaluation far past human review. It&rsquo;s the backbone of modern eval &mdash; but it is a measurement instrument, and an uncalibrated instrument lies confidently.</p>
+        <ul class="case-meta">
+          <li>position bias</li><li>verbosity/length bias</li><li>self-preference bias</li><li>rubric drift</li><li>cost</li>
+        </ul>
+        <p class="lab-copy" style="margin-top:1rem">How I keep it honest:</p>
+        <ul class="tight" style="color:var(--text-muted)">
+          <li><strong>Anchor to humans:</strong> measure judge&ndash;human agreement (e.g., Cohen&rsquo;s &kappa;) on a sample; align rubrics until agreement is acceptable, then let the judge scale.</li>
+          <li><strong>Constrain the task:</strong> pairwise comparison and rubric-scored booleans are more reliable than free-form 1&ndash;10 scores.</li>
+          <li><strong>Control for bias:</strong> randomize answer order; strip length cues; avoid judging a model with itself where possible.</li>
+          <li><strong>Keep humans in the loop</strong> for high-stakes and borderline cases; feed their adjudications back into the rubric.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 5. Traceability + gates -->
+    <section class="section" id="gates" aria-labelledby="gates-title">
+      <div class="container">
+        <h2 class="section__title" id="gates-title">5 &middot; Traceability &amp; release gates</h2>
+        <p class="lab-copy">A score you can&rsquo;t reproduce is a rumor. Treat prompts, datasets, and policies as versioned, first-class assets, and make promotion a gate &mdash; not a meeting.</p>
+<pre class="ascii" aria-label="Evaluation-gated release flow">
+ candidate (model+prompt) ─▶ eval run ─▶ scores vs <b>thresholds</b>
+       │                                       │
+       │                            pass ──────┴────── fail ─▶ block + report
+       ▼                                                        (diff vs baseline)
+ register (immutable + checksum) ─▶ approval ─▶ canary ─▶ promote
+       │                                                     │
+       └──────────── lineage: score ↔ prompt id ↔ model ver ↔ dataset ver
+                     rollback trigger = same thresholds crossed in prod
+</pre>
+        <p class="lab-copy">This is exactly the shape of the release/eval control plane I built (immutable S3 artifacts, checksum-governed promotion, MLflow traces, LLM-as-judge, cloud-vs-device benchmarks) &mdash; see the <a href="/systems/#controlplane">Systems</a> page.</p>
+      </div>
+    </section>
+
+    <!-- 6. Tooling landscape -->
+    <section class="section section--alt" id="tools" aria-labelledby="tools-title">
+      <div class="container">
+        <h2 class="section__title" id="tools-title">6 &middot; The 2026 tooling landscape</h2>
+        <p class="lab-copy">I pick by layer and risk profile, not by hype. Regulated products want an integrated audit trail; high-headcount teams assemble best-of-breed. The through-line is a <em>system of record</em> that versions everything.</p>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Tool</th><th>Primary layer</th><th>Best at</th></tr></thead>
+            <tbody>
+              <tr><td>DeepEval</td><td>Testing / eval</td><td>Pytest-style unit tests for LLMs; 50+ metrics; CI quality gates</td></tr>
+              <tr><td>RAGAS</td><td>Eval (RAG/agents)</td><td>research-validated RAG metrics + tool-call/agent-goal accuracy</td></tr>
+              <tr><td>MLflow</td><td>Eval + registry</td><td>unifies DeepEval/RAGAS/Phoenix judges; judge alignment; model registry lineage</td></tr>
+              <tr><td>W&amp;B Weave</td><td>Observability + eval</td><td>trace trees, golden-set evals, live scoring + human feedback loops</td></tr>
+              <tr><td>Langfuse</td><td>Observability</td><td>open-source, self-hostable tracing + event logging</td></tr>
+              <tr><td>LangSmith</td><td>Observability</td><td>deep tracing + debugging for LangChain/LangGraph apps</td></tr>
+              <tr><td>Arize Phoenix</td><td>Observability</td><td>embedding-based drift detection; hallucination scoring</td></tr>
+              <tr><td>Helicone</td><td>Monitoring</td><td>per-call logs/metrics, cost + latency alerting</td></tr>
+              <tr><td>Giskard</td><td>Governance / safety</td><td>bias/fairness auditing with non-technical stakeholder review</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="lab-copy">All real, all current; the meta-trend is convergence &mdash; MLflow now runs DeepEval, RAGAS, and Phoenix metrics through one <code>evaluate</code> API with built-in human-feedback alignment.</p>
+      </div>
+    </section>
+
+    <!-- 7. How I apply it -->
+    <section class="section" id="applied" aria-labelledby="applied-title">
+      <div class="container">
+        <h2 class="section__title" id="applied-title">7 &middot; How I apply this in practice</h2>
+        <ul class="tight" style="color:var(--text-muted); max-width:74ch">
+          <li><strong>Email automation:</strong> DeepEval for tool-selection + argument correctness and task completion, wired into CI as a release gate; classifier accuracy with drift alerts.</li>
+          <li><strong>Insurance assistant:</strong> intent F1 + calibration with temporal splits and confusion analysis; safety red-teaming for prompt injection; transfer-rate as the business truth.</li>
+          <li><strong>Healthcare RAG:</strong> faithfulness / answer relevancy / context precision-recall + citation correctness on a curated golden set; hallucination held near zero via response validation.</li>
+          <li><strong>On-device Sales AI:</strong> WER/CER + structured-output validity + summary faithfulness, with cloud-vs-device parity benchmarks gating every model bump.</li>
+          <li><strong>Across all of them:</strong> immutable checksum-governed artifacts, MLflow traces, and lineage so any score reproduces &mdash; the difference between &ldquo;it felt better&rdquo; and &ldquo;here&rsquo;s the diff.&rdquo;</li>
+        </ul>
+        <p class="lab-copy lab-copy--foot">
+          Sources &amp; further reading:
+          <a href="https://arxiv.org/abs/2309.15217" rel="noopener">RAGAS (Es et al., EACL 2024)</a> ·
+          <a href="https://github.com/confident-ai/deepeval" rel="noopener">DeepEval</a> ·
+          <a href="https://mlflow.org/docs/latest/genai/eval-monitor/" rel="noopener">MLflow GenAI evaluation</a> ·
+          <a href="https://mlflow.org/blog/third-party-scorers/" rel="noopener">MLflow third-party judges</a>.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <p><a href="/">&larr; Back to home</a> &middot; &copy; 2021&ndash;<span id="year">2026</span> Jorge Grisman</p>
+      <p class="site-footer__note">A working field guide, not vendor marketing. No trackers.</p>
+    </div>
+  </footer>
+
+  <script src="/assets/js/main.js" defer></script>
+</body>
+</html>
