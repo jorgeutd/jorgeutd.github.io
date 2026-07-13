@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script>document.documentElement.classList.remove('no-js');document.documentElement.classList.add('js');</script>
-  <meta name="color-scheme" content="dark" />
+  <script>document.documentElement.classList.remove('no-js');document.documentElement.classList.add('js');try{document.documentElement.dataset.theme=localStorage.getItem('theme')||'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
+  <meta name="color-scheme" content="light dark" />
   <title>How I Evaluate Production AI Systems — Evals, Observability &amp; Governance · Jorge Grisman</title>
   <meta name="description" content="A principal-level field guide to evaluating production AI systems: evaluation vs observability vs monitoring, the offline-to-online continuum, metrics by system type, LLM-as-judge and its caveats, traceability/lineage, release gates, and the 2026 tooling landscape (DeepEval, RAGAS, W&B Weave, MLflow, Langfuse, Arize Phoenix, Giskard)." />
   <meta name="author" content="Jorge Lopez Grisman" />

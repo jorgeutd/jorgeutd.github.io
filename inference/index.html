@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script>document.documentElement.classList.remove('no-js');document.documentElement.classList.add('js');</script>
-  <meta name="color-scheme" content="dark" />
+  <script>document.documentElement.classList.remove('no-js');document.documentElement.classList.add('js');try{document.documentElement.dataset.theme=localStorage.getItem('theme')||'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
+  <meta name="color-scheme" content="light dark" />
   <title>Inference Lab — KV Caching &amp; SOTA LLM Serving · Jorge Grisman</title>
   <meta name="description" content="An interactive, technically accurate visualization of the transformer KV cache and state-of-the-art LLM inference techniques: PagedAttention, continuous batching, speculative decoding, GQA/MQA, prefix caching, and KV quantization." />
   <meta name="author" content="Jorge Lopez Grisman" />

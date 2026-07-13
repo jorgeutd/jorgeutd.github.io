@@ -15,11 +15,55 @@
   --accent-2: #82c3b8;   /* lighter teal, same family (subtle gradients) */
   --accent-strong: #a6d8cf; /* brighter teal for hover / emphasis */
   --focus: #e8b866;      /* warm amber focus ring (distinct from accent) */
+  --on-accent: #04121f;  /* text on accent fills */
+  --header-bg: rgba(15, 19, 25, 0.82);
+  --grid: rgba(255, 255, 255, 0.022); /* subtle background lattice */
+  --shadow: rgba(0, 0, 0, 0.5);
   --radius: 14px;
   --maxw: 1080px;
   --space: clamp(1rem, 2.5vw, 2rem);
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
     "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+}
+
+/* Light theme — Hugging Face / GitHub-style soft-grey surface.
+   Interactive viz panels intentionally stay dark (see .viz-canvas/.ascii). */
+[data-theme="light"] {
+  --bg: #f5f7fa;
+  --bg-alt: #eceff4;
+  --surface: #ffffff;
+  --surface-2: #eef2f7;
+  --border: #dce2ea;
+  --text: #1b2230;
+  --text-muted: #566173;
+  --accent: #217a6e;        /* dark teal — AA on light surfaces */
+  --accent-2: #2f9384;
+  --accent-strong: #175e54;
+  --focus: #175e54;
+  --on-accent: #ffffff;
+  --header-bg: rgba(255, 255, 255, 0.85);
+  --grid: rgba(20, 34, 58, 0.05);
+  --shadow: rgba(24, 39, 75, 0.14);
+}
+[data-theme="light"] .hero,
+[data-theme="light"] .lab-hero {
+  background:
+    radial-gradient(1000px 500px at 82% -10%, rgba(33, 122, 110, 0.10), transparent 60%),
+    radial-gradient(820px 420px at 8% 8%, rgba(47, 147, 132, 0.08), transparent 55%),
+    var(--bg-alt);
+}
+[data-theme="light"] .card:hover,
+[data-theme="light"] .tech:hover,
+[data-theme="light"] .skill-group:hover,
+[data-theme="light"] .stat:hover {
+  box-shadow: 0 14px 34px -20px var(--shadow);
+}
+[data-theme="light"] .card,
+[data-theme="light"] .tech,
+[data-theme="light"] .skill-group,
+[data-theme="light"] .stat,
+[data-theme="light"] .lab-cta {
+  box-shadow: 0 1px 2px rgba(24, 39, 75, 0.05);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -30,6 +74,8 @@ body {
   margin: 0;
   font-family: var(--font);
   background:
+    linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 46px 46px,
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 46px 46px,
     radial-gradient(1200px 620px at 100% -8%, rgba(95, 168, 158, 0.06), transparent 60%),
     radial-gradient(1000px 700px at -12% 8%, rgba(130, 195, 184, 0.06), transparent 55%),
     var(--bg);
@@ -47,7 +93,7 @@ body {
   top: -3rem;
   z-index: 100;
   background: var(--accent);
-  color: #04121f;
+  color: var(--on-accent);
   padding: 0.6rem 1rem;
   border-radius: 8px;
   font-weight: 700;
@@ -80,7 +126,7 @@ img, svg { max-width: 100%; }
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(11, 15, 26, 0.82);
+  background: var(--header-bg);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border);
 }
@@ -108,7 +154,7 @@ img, svg { max-width: 100%; }
   height: 34px;
   border-radius: 9px;
   font-size: 0.85rem;
-  color: #04121f;
+  color: var(--on-accent);
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
 }
 .nav__menu {
@@ -209,8 +255,9 @@ img, svg { max-width: 100%; }
   border: 1px solid transparent;
   transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
 }
-.btn--primary { background: var(--accent); color: #04121f; }
-.btn--primary:hover { background: var(--accent-strong); color: #04121f; transform: translateY(-2px); }
+.btn--primary { background: var(--accent); color: var(--on-accent); }
+.btn--primary:hover { background: var(--accent-strong); color: var(--on-accent); transform: translateY(-2px); }
+[data-theme="light"] .btn--primary:hover { color: #ffffff; }
 .btn--ghost { border-color: var(--border); color: var(--text); background: var(--surface); }
 .btn--ghost:hover { border-color: var(--accent); color: var(--text); transform: translateY(-2px); }
 .icon { width: 20px; height: 20px; }
@@ -452,6 +499,23 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width
 /* Active nav item (scrollspy) ---------------------------------------------- */
 .nav__menu a[aria-current="true"],
 .nav__menu a[aria-current="page"] { color: var(--text); background: var(--surface); }
+
+/* Theme toggle ------------------------------------------------------------- */
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 34px;
+  margin-left: 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.theme-toggle:hover { color: var(--text); border-color: var(--accent); }
+.theme-toggle svg { width: 18px; height: 18px; }
 
 /* Command palette (⌘K) ------------------------------------------------------ */
 .cmdk-trigger {

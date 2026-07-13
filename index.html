@@ -6,8 +6,8 @@
   <!-- Progressive enhancement: swap no-js -> js before paint so the CSS can
        decide whether the collapsible nav (JS) or the always-visible nav
        (no-JS fallback) is shown, with no flash. -->
-  <script>document.documentElement.classList.remove('no-js');document.documentElement.classList.add('js');</script>
-  <meta name="color-scheme" content="dark" />
+  <script>document.documentElement.classList.remove('no-js');document.documentElement.classList.add('js');try{document.documentElement.dataset.theme=localStorage.getItem('theme')||'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
+  <meta name="color-scheme" content="light dark" />
   <title>Jorge Grisman — Principal AI Engineer · AI Agents &amp; LLM Inference</title>
   <meta name="description" content="Jorge Lopez Grisman — Principal AI Engineer focused on AI agents and LLM inference. I design and ship production AI systems end to end: multi-agent architectures, on-device and cloud LLM/STT inference, MCP tooling, and the evaluation and governance that make them safe to run." />
   <meta name="author" content="Jorge Lopez Grisman" />

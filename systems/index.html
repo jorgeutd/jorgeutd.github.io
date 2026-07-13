@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script>document.documentElement.classList.remove('no-js');document.documentElement.classList.add('js');</script>
-  <meta name="color-scheme" content="dark" />
+  <script>document.documentElement.classList.remove('no-js');document.documentElement.classList.add('js');try{document.documentElement.dataset.theme=localStorage.getItem('theme')||'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
+  <meta name="color-scheme" content="light dark" />
   <title>System Design &amp; Architecture — Production AI Case Studies · Jorge Grisman</title>
   <meta name="description" content="Principal-level architecture case studies of production AI systems I've designed and shipped: offline-first on-device Sales AI, enterprise multi-agent email automation, an AI release/eval/observability control plane, an insurance virtual assistant, and a healthcare RAG assistant — with scale, trade-offs, failure modes, evals, and business outcomes." />
   <meta name="author" content="Jorge Lopez Grisman" />

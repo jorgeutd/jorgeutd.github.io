@@ -4,6 +4,19 @@
 
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  /* Read a CSS custom property as an "r,g,b" string (for canvas rgba()). */
+  function cssRgb(name, fallback) {
+    try {
+      var v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      if (v.charAt(0) === "#") {
+        var h = v.slice(1);
+        if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+        return parseInt(h.slice(0, 2), 16) + "," + parseInt(h.slice(2, 4), 16) + "," + parseInt(h.slice(4, 6), 16);
+      }
+    } catch (e) {}
+    return fallback;
+  }
+
   /* Current year in footer */
   var yearEl = document.getElementById("year");
   if (yearEl) { yearEl.textContent = String(new Date().getFullYear()); }
@@ -52,7 +65,12 @@
     if (!ctx) return;
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     var W = 0, H = 0, nodes = [], raf = 0, running = false;
-    var LINK = 130, ACCENT = "95,168,158", ACCENT2 = "130,195,184";
+    var LINK = 130, ACCENT = cssRgb("--accent", "95,168,158"), ACCENT2 = cssRgb("--accent-2", "130,195,184");
+    window.addEventListener("themechange", function () {
+      ACCENT = cssRgb("--accent", "95,168,158");
+      ACCENT2 = cssRgb("--accent-2", "130,195,184");
+      frame(performance.now());
+    });
 
     function resize() {
       var rect = canvas.getBoundingClientRect();
@@ -119,6 +137,33 @@
       } else { start(); }
     }
   }
+
+  /* Theme toggle (light / dark), persisted to localStorage */
+  (function themeToggle() {
+    var nav = document.querySelector(".nav");
+    if (!nav) return;
+    var root = document.documentElement;
+    var SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>';
+    var MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>';
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "theme-toggle";
+    function render() {
+      var light = root.dataset.theme === "light";
+      btn.innerHTML = light ? MOON : SUN;
+      btn.setAttribute("aria-label", light ? "Switch to dark theme" : "Switch to light theme");
+      btn.setAttribute("aria-pressed", String(!light));
+    }
+    btn.addEventListener("click", function () {
+      var next = root.dataset.theme === "light" ? "dark" : "light";
+      root.dataset.theme = next;
+      try { localStorage.setItem("theme", next); } catch (e) {}
+      render();
+      window.dispatchEvent(new CustomEvent("themechange"));
+    });
+    nav.appendChild(btn);
+    render();
+  })();
 
   /* Scroll progress bar */
   (function scrollProgress() {
