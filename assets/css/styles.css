@@ -4,17 +4,17 @@
 --------------------------------------------------------------------------- */
 
 :root {
-  --bg: #0b0f1a;
-  --bg-alt: #0f1424;
-  --surface: #141b2e;
-  --surface-2: #1a2338;
-  --border: #243049;
-  --text: #e7ecf5;      /* ~14:1 on --bg */
-  --text-muted: #a3afc7; /* ~7:1 on --bg */
-  --accent: #7cc7ff;     /* single accent */
-  --accent-2: #a78bfa;   /* decorative gradient partner only */
-  --accent-strong: #bfe0ff;
-  --focus: #ffd166;
+  --bg: #0f1319;         /* warm-neutral charcoal */
+  --bg-alt: #131922;
+  --surface: #182129;
+  --surface-2: #212b35;
+  --border: #2c3743;
+  --text: #e9edf2;       /* high contrast on --bg */
+  --text-muted: #9aa6b4; /* AA on bg + surfaces */
+  --accent: #5fa89e;     /* muted teal — single restrained accent */
+  --accent-2: #82c3b8;   /* lighter teal, same family (subtle gradients) */
+  --accent-strong: #a6d8cf; /* brighter teal for hover / emphasis */
+  --focus: #e8b866;      /* warm amber focus ring (distinct from accent) */
   --radius: 14px;
   --maxw: 1080px;
   --space: clamp(1rem, 2.5vw, 2rem);
@@ -30,8 +30,8 @@ body {
   margin: 0;
   font-family: var(--font);
   background:
-    radial-gradient(1200px 620px at 100% -8%, rgba(124, 199, 255, 0.06), transparent 60%),
-    radial-gradient(1000px 700px at -12% 8%, rgba(167, 139, 250, 0.06), transparent 55%),
+    radial-gradient(1200px 620px at 100% -8%, rgba(95, 168, 158, 0.06), transparent 60%),
+    radial-gradient(1000px 700px at -12% 8%, rgba(130, 195, 184, 0.06), transparent 55%),
     var(--bg);
   background-attachment: fixed;
   color: var(--text);
@@ -158,8 +158,8 @@ img, svg { max-width: 100%; }
   overflow: hidden;
   padding: clamp(3.5rem, 12vw, 8rem) 0 clamp(3rem, 8vw, 6rem);
   background:
-    radial-gradient(1000px 500px at 80% -10%, rgba(124, 199, 255, 0.16), transparent 60%),
-    radial-gradient(800px 400px at 10% 10%, rgba(167, 139, 250, 0.14), transparent 55%),
+    radial-gradient(1000px 500px at 80% -10%, rgba(95, 168, 158, 0.16), transparent 60%),
+    radial-gradient(800px 400px at 10% 10%, rgba(130, 195, 184, 0.14), transparent 55%),
     var(--bg);
 }
 .hero__bg {
@@ -255,7 +255,7 @@ img, svg { max-width: 100%; }
 .card:hover {
   transform: translateY(-4px);
   border-color: var(--accent);
-  box-shadow: 0 12px 30px -18px rgba(124, 199, 255, 0.7);
+  box-shadow: 0 12px 30px -18px rgba(95, 168, 158, 0.7);
 }
 .card__title { margin: 0 0 0.6rem; font-size: 1.2rem; }
 .card__title a { text-decoration: none; }
@@ -292,7 +292,7 @@ img, svg { max-width: 100%; }
 .skill-group:hover {
   transform: translateY(-3px);
   border-color: var(--accent);
-  box-shadow: 0 12px 30px -20px rgba(124, 199, 255, 0.65);
+  box-shadow: 0 12px 30px -20px rgba(95, 168, 158, 0.65);
 }
 .skill-group__title { margin: 0 0 0.9rem; font-size: 1.05rem; color: var(--accent); }
 .chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
@@ -356,7 +356,7 @@ img, svg { max-width: 100%; }
 .lab-cta {
   position: relative;
   background:
-    radial-gradient(600px 220px at 90% 0%, rgba(124, 199, 255, 0.14), transparent 60%),
+    radial-gradient(600px 220px at 90% 0%, rgba(95, 168, 158, 0.14), transparent 60%),
     var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -417,7 +417,7 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width
 .tbl th { color: var(--accent); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.03em; }
 .tbl td { color: var(--text-muted); }
 .tbl td:first-child { color: var(--text); font-weight: 600; }
-.tbl tbody tr:hover td, .tbl tr:hover td { background: rgba(124, 199, 255, 0.04); }
+.tbl tbody tr:hover td, .tbl tr:hover td { background: rgba(95, 168, 158, 0.04); }
 
 /* Case-study meta row ------------------------------------------------------ */
 .case-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0 0 1rem; padding: 0; list-style: none; }

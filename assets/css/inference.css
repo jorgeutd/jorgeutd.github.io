@@ -5,8 +5,8 @@
   overflow: hidden;
   padding: clamp(3rem, 9vw, 6rem) 0 clamp(2rem, 5vw, 3.5rem);
   background:
-    radial-gradient(900px 460px at 82% -10%, rgba(124, 199, 255, 0.16), transparent 60%),
-    radial-gradient(700px 380px at 6% 6%, rgba(167, 139, 250, 0.14), transparent 55%),
+    radial-gradient(900px 460px at 82% -10%, rgba(95, 168, 158, 0.16), transparent 60%),
+    radial-gradient(700px 380px at 6% 6%, rgba(130, 195, 184, 0.14), transparent 55%),
     var(--bg);
   border-bottom: 1px solid var(--border);
 }
@@ -119,7 +119,7 @@
 .tech:hover {
   transform: translateY(-3px);
   border-color: var(--accent);
-  box-shadow: 0 14px 32px -20px rgba(124, 199, 255, 0.6);
+  box-shadow: 0 14px 32px -20px rgba(95, 168, 158, 0.6);
 }
 .tech h3 { margin: 0 0 0.5rem; font-size: 1.15rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: baseline; }
 .tech__src { font-size: 0.72rem; font-weight: 500; color: var(--text-muted); }

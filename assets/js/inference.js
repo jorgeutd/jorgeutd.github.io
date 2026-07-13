@@ -3,7 +3,7 @@
   "use strict";
 
   var REDUCE = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var ACCENT = "#7cc7ff", ACCENT2 = "#a78bfa", PROMPT = "#3a557f",
+  var ACCENT = "#5fa89e", ACCENT2 = "#82c3b8", PROMPT = "#3a557f",
       GRID = "#1a2338", DIM = "#202a41", INK = "#070b14", MUTED = "#a3afc7";
 
   var KIB = 1024, MIB = 1024 * 1024, GIB = 1024 * 1024 * 1024;
@@ -93,7 +93,7 @@
         ctx.lineWidth = 1;
         for (var j = 0; j < active; j++) {
           var p = cellXY(j);
-          ctx.strokeStyle = "rgba(167,139,250," + (j / active * 0.35 + 0.05).toFixed(3) + ")";
+          ctx.strokeStyle = "rgba(130,195,184," + (j / active * 0.35 + 0.05).toFixed(3) + ")";
           ctx.beginPath();
           ctx.moveTo(a.x + cell / 2, a.y + cell / 2);
           ctx.lineTo(p.x + cell / 2, p.y + cell / 2);
@@ -444,7 +444,7 @@
       ctx.lineWidth = 1.2;
       for (var i = 0; i < Q; i++) {
         var g = Math.floor(i / (Q / KV));
-        ctx.strokeStyle = "rgba(124,199,255,0.35)";
+        ctx.strokeStyle = "rgba(95,168,158,0.35)";
         ctx.beginPath(); ctx.moveTo(qx(i), topY + 8); ctx.lineTo(kx(g), botY - 8); ctx.stroke();
       }
       // query heads

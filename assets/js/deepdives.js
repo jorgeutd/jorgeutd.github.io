@@ -4,7 +4,7 @@
 (function () {
   "use strict";
   var REDUCE = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var ACCENT = "#7cc7ff", ACCENT2 = "#a78bfa", DIM = "#26324c", MUTED = "#a3afc7", TEXT = "#e7ecf5";
+  var ACCENT = "#5fa89e", ACCENT2 = "#82c3b8", DIM = "#26324c", MUTED = "#a3afc7", TEXT = "#e7ecf5";
 
   var canvas = document.getElementById("decode-canvas");
   if (!canvas) return;
@@ -156,7 +156,7 @@
     var elL = document.getElementById("pe-l"), elD = document.getElementById("pe-d");
     var oL = document.getElementById("pe-l-out"), oD = document.getElementById("pe-d-out");
     // diverging colormap stops: -1 -> accent2, 0 -> bg, +1 -> accent
-    var NEG = [167, 139, 250], ZERO = [11, 15, 26], POS = [124, 199, 255];
+    var NEG = [201, 154, 106], ZERO = [15, 19, 25], POS = [95, 168, 158];
     function mix(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
     function color(v) { // v in [-1,1]
       var c = v < 0 ? mix(ZERO, NEG, -v) : mix(ZERO, POS, v);

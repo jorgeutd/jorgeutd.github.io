@@ -52,7 +52,7 @@
     if (!ctx) return;
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     var W = 0, H = 0, nodes = [], raf = 0, running = false;
-    var LINK = 130, ACCENT = "124,199,255", ACCENT2 = "167,139,250";
+    var LINK = 130, ACCENT = "95,168,158", ACCENT2 = "130,195,184";
 
     function resize() {
       var rect = canvas.getBoundingClientRect();
