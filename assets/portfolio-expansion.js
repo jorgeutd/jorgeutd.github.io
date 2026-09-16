@@ -27,7 +27,7 @@ function addViews() {
  for(const [name,label,icon] of [['demos','Interactive demos','i-box'],['models','Open models','i-lab']]) {
   const a=document.createElement('a');a.className='nav-item';a.dataset.view=name;a.href='#'+name;
   a.innerHTML=`<svg fill="none" stroke="currentColor" aria-hidden="true"><use href="#${icon}"/></svg>${label}`;
-  nav.insertBefore(a,nav.querySelector('[data-view="about"]'));
+  nav.append(a);
  }
  const home=document.createElement('section');home.className='heritage-section';
  home.innerHTML=`<div><span class="eyebrow">Open-source on Hugging Face</span><h2>Model work dating to 2021.</h2><p>Before today’s agent stacks: fine-tuning encoders, extracting entities, classifying emotion, and building summarizers. A public collection that connects years of model work to the systems I build now.</p>${link('Explore the model collection →','#models')}</div><div class="heritage-years">${link('2021 · BERT & RoBERTa','#models')}${link('2022 · NER & summarization','#models')}${link('2024 · SetFit, 50 shots per class','#models')}</div>`;

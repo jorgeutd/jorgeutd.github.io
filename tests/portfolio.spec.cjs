@@ -38,6 +38,24 @@ test('system atlas links architecture, playback, failure handling and trace insp
  const pending=page.waitForEvent('download');await page.locator('#architecture-download').click();const dl=await pending;expect(dl.suggestedFilename()).toBe('reference-architecture-application.svg');const text=fs.readFileSync(await dl.path(),'utf8');expect(text).toContain('FastAPI boundary');expect(text).not.toMatch(forbidden);
 });
 
+test('experience is easy to find and the portrait loads on desktop and mobile',async({page,isMobile},info)=>{
+ await page.goto('/');
+ await expect(page.locator('#sidebar nav .nav-item').nth(1)).toHaveAttribute('href','#about');
+ await page.locator('.career-section').screenshot({path:path.join(screenshots,info.project.name+'-career.png')});
+ await page.locator('.career-heading a').click();await expect(page.locator('#view-about')).toBeVisible();
+ await expect(page.locator('[data-view="about"]')).toHaveAttribute('aria-current','page');
+ const portrait=page.getByRole('img',{name:'Jorge Grisman',exact:true});await expect(portrait).toBeVisible();
+ await expect.poll(()=>portrait.evaluate(img=>img.complete&&img.naturalWidth===480)).toBeTruthy();
+ await noOverflow(page);await shot(page,info,'about-full');
+ if(isMobile)await page.locator('#menu-toggle').click();
+ await page.locator('#theme-toggle').click();
+ if(isMobile)await page.locator('#scrim').click({position:{x:page.viewportSize().width-10,y:30}});
+ await noOverflow(page);await shot(page,info,'about-dark-full');
+ await page.goto('/notes/tracing/');if(isMobile)await page.locator('#menu-toggle').click();
+ await page.locator('[data-view="about"]').click();await expect(page.locator('#view-about')).toBeVisible();
+ await expect(portrait).toBeVisible();await noOverflow(page);
+});
+
 test('all four architecture studies expose inspectable components and readable layouts',async({page},info)=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));for(const study of ['application','inference','device','quantization']){await page.goto('/#demos/architecture/'+study);await expect(page.locator('[data-study="'+study+'"]')).toHaveAttribute('aria-pressed','true');await expect(page.locator('.atlas-node')).toHaveCount(16);await page.locator('#atlas-component').selectOption('14');await expect(page.locator('[data-node="14"]')).toHaveAttribute('aria-pressed','true');await expect(page.locator('#atlas-inspector dd')).toHaveCount(3);await page.locator('[data-channel-filter="telemetry"]').click();await expect(page.locator('.atlas-edge[data-channel="execution"]').first()).toHaveCSS('opacity','0.06');await page.locator('[data-channel-filter="all"]').click();await page.locator('#atlas-fit').click();expect(await page.locator('.atlas-map-scroll').evaluate(el=>el.scrollWidth<=el.clientWidth+1)).toBeTruthy();await noOverflow(page);await page.locator('[data-node="0"]').focus();await page.keyboard.press('Enter');await expect(page.locator('[data-node="0"]')).toHaveAttribute('aria-pressed','true');await shot(page,info,'atlas-'+study);}
  expect(errors).toEqual([]);
