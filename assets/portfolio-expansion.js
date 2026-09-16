@@ -70,6 +70,7 @@ function demoGlyph(key){
  };return `<svg viewBox="0 0 250 90" aria-hidden="true">${glyphs[key]}</svg>`;
 }
 function renderDemos(key) {
+ el('view-demos').dataset.demo=DEMOS[key]?key:'index';
  if(!DEMOS[key]){el('view-demos').innerHTML=`<header class="page-intro"><p class="eyebrow">Interactive demos</p><h1>Explore how AI systems work.</h1><p>Six browser experiments. Change the inputs, follow an execution, and inspect the result. Start with a mechanism or explore an entire system.</p></header><div class="demo-gallery">${Object.entries(DEMOS).map(([k,[title,desc]],i)=>`<a class="demo-card" href="#demos/${k}"><div class="demo-card-art">${demoGlyph(k)}</div><div class="demo-card-copy"><span class="tag">${String(i+1).padStart(2,'0')} / ${k==='architecture'?'Four system studies':'Interactive experiment'}</span><h2>${title}</h2><p>${desc}</p><span class="demo-card-link">${k==='architecture'?'Explore the atlas':'Open the experiment'} →</span></div></a>`).join('')}</div><p class="demo-gallery-note">These are original teaching examples using synthetic inputs and browser calculations. Related public repositories and primary sources are linked within each experiment.</p>`;return 'Interactive demos';}
  el('view-demos').innerHTML=demoHeader(key)+'<div id="demo-mount"></div>';renderPublicDemo(key,el('demo-mount'));return DEMOS[key][0];
 }
