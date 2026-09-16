@@ -6,3 +6,4 @@
 @media(prefers-reduced-motion:reduce){.demo-card,.atlas-node rect,.atlas-edge{transition:none}.demo-card:hover{transform:none}}
 
 #view-demos[data-demo=architecture]>.page-intro{padding-top:24px;padding-bottom:14px}#view-demos[data-demo=architecture]>.page-intro .eyebrow,#view-demos[data-demo=architecture]>.page-intro>p:last-child,#view-demos[data-demo=architecture]>.demo-switch{display:none}#view-demos[data-demo=architecture]>.page-intro .route-back{margin:0 0 5px}#view-demos[data-demo=architecture]>.page-intro h1{font-size:32px;letter-spacing:-1px;margin:8px 0 10px}.atlas-studies{margin-top:0}.atlas-node:focus-visible rect{stroke-width:3}
+.skip{opacity:0;pointer-events:none}.skip:focus{opacity:1;pointer-events:auto}
