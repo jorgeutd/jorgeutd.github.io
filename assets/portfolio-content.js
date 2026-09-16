@@ -101,7 +101,7 @@ window.PORTFOLIO_CONTENT = {
         ],
         [
           "04 / Connect a failed result to inspectable evidence",
-          "Retain task and dataset revisions, role and model identifiers, prompt versions, tool arguments and results, parent-span relationships, handoff payloads, retries, and the final artifact. Judge observable actions and evidence, not a claim of hidden reasoning. MAST offers a useful failure vocabulary across system specification, inter-agent alignment, and verification or termination. In my evaluation design, those labels help group failures; they do not replace an executable check of what happened. Review a sample of apparently successful runs as well as failures.",
+          "Retain task and dataset revisions, role and model identifiers, prompt versions, tool arguments and results, parent-span relationships, handoff payloads, retries, and the final artifact. Judge observable actions and evidence, not a claim of hidden reasoning. MAST offers a useful failure vocabulary across system specification, inter-agent alignment, and verification or termination. In my evaluation design, those labels help group failures; they do not replace an executable check of what happened. Allow different valid plans: check required invariants and ordering constraints instead of insisting on one exact tool sequence. Review apparently successful runs as well as failures.",
           [
             [
               "MAST · Why Do Multi-Agent LLM Systems Fail?",

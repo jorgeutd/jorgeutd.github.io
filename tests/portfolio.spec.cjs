@@ -2,7 +2,7 @@ const {test,expect}=require('@playwright/test');
 const fs=require('node:fs'),path=require('node:path');
 const forbidden=/s3:\/\/|C:\\\\Users\\\\|x-amz-credential/i;
 const screenshots=path.resolve('screenshots');fs.mkdirSync(screenshots,{recursive:true});
-async function shot(page,testInfo,name){await page.screenshot({path:path.join(screenshots,testInfo.project.name+'-'+name+'.png'),fullPage:name==='home'||name.includes('full')||name.startsWith('atlas-')});}
+async function shot(page,testInfo,name){const fullPage=name==='home'||name.includes('full')||name.startsWith('atlas-');if(fullPage)await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:path.join(screenshots,testInfo.project.name+'-'+name+'.png'),fullPage});}
 async function setRange(page,selector,value){await page.locator(selector).evaluate((node,v)=>{node.value=v;node.dispatchEvent(new Event('input',{bubbles:true}));},String(value));}
 async function noOverflow(page){expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();}
 test('homepage, copyright, public project links and top compatibility',async({page},info)=>{
@@ -56,7 +56,7 @@ test('experience is easy to find and the portrait loads on desktop and mobile',a
  await expect(portrait).toBeVisible();await noOverflow(page);
 });
 
-test('architecture explorer distinguishes attention visibility and task starting points',async({page},info)=>{
+test('architecture explorer distinguishes attention visibility and task starting points',async({page,isMobile},info)=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/#research');
  const lab=page.locator('#view-research .architecture-explorer');
  await expect(lab.locator('.attention-cell.selected-query.allowed')).toHaveCount(4);
@@ -65,7 +65,7 @@ test('architecture explorer distinguishes attention visibility and task starting
  await expect(lab.locator('.attention-cell.selected-query:not(.allowed)')).toHaveCount(3);
  await lab.locator('[data-task-choice]').selectOption('summarization');await expect(lab.locator('[data-family="seq2seq"]')).toHaveAttribute('aria-pressed','true');
  await expect(lab.locator('.attention-grid')).toHaveCount(3);await expect(lab.locator('.attention-example').last().locator('.selected-query.allowed')).toHaveCount(4);
- await expect(lab.locator('.task-rationale')).toContainText('Factual support');await noOverflow(page);await shot(page,info,'research-full');
+ await expect(lab.locator('.task-rationale')).toContainText('Factual support');await expect(lab.locator(isMobile?'.family-diagram-mobile':'.family-diagram')).toBeVisible();await noOverflow(page);await shot(page,info,'research-full');
  await lab.locator('[data-family="encoder"]').focus();await page.keyboard.press('Enter');await expect(lab.locator('[data-family="encoder"]')).toHaveAttribute('aria-pressed','true');expect(errors).toEqual([]);
 });
 
