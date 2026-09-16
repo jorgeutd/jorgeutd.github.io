@@ -2,7 +2,7 @@ const {test,expect}=require('@playwright/test');
 const fs=require('node:fs'),path=require('node:path');
 const forbidden=/s3:\/\/|C:\\\\Users\\\\|x-amz-credential/i;
 const screenshots=path.resolve('screenshots');fs.mkdirSync(screenshots,{recursive:true});
-async function shot(page,testInfo,name){await page.screenshot({path:path.join(screenshots,testInfo.project.name+'-'+name+'.png'),fullPage:name==='home'||name.includes('full')||name.startsWith('atlas-')});}
+async function shot(page,testInfo,name){const fullPage=name==='home'||name.includes('full')||name.startsWith('atlas-');if(fullPage)await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:path.join(screenshots,testInfo.project.name+'-'+name+'.png'),fullPage});}
 async function setRange(page,selector,value){await page.locator(selector).evaluate((node,v)=>{node.value=v;node.dispatchEvent(new Event('input',{bubbles:true}));},String(value));}
 async function noOverflow(page){expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();}
 test('homepage, copyright, public project links and top compatibility',async({page},info)=>{
@@ -54,6 +54,50 @@ test('experience is easy to find and the portrait loads on desktop and mobile',a
  await page.goto('/notes/tracing/');if(isMobile)await page.locator('#menu-toggle').click();
  await page.locator('[data-view="about"]').click();await expect(page.locator('#view-about')).toBeVisible();
  await expect(portrait).toBeVisible();await noOverflow(page);
+});
+
+test('architecture explorer distinguishes attention visibility and task starting points',async({page,isMobile},info)=>{
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/#research');
+ const lab=page.locator('#view-research .architecture-explorer');
+ await expect(lab.locator('.attention-cell.selected-query.allowed')).toHaveCount(4);
+ await lab.locator('[data-family="decoder"]').click();await lab.locator('[data-query="0"]').click();
+ await expect(lab.locator('.attention-cell.selected-query.allowed')).toHaveCount(1);
+ await expect(lab.locator('.attention-cell.selected-query:not(.allowed)')).toHaveCount(3);
+ await lab.locator('[data-task-choice]').selectOption('summarization');await expect(lab.locator('[data-family="seq2seq"]')).toHaveAttribute('aria-pressed','true');
+ await expect(lab.locator('.attention-grid')).toHaveCount(3);await expect(lab.locator('.attention-example').last().locator('.selected-query.allowed')).toHaveCount(4);
+ await expect(lab.locator('.task-rationale')).toContainText('Factual support');await expect(lab.locator(isMobile?'.family-diagram-mobile':'.family-diagram')).toBeVisible();await noOverflow(page);await shot(page,info,'research-full');
+ await lab.locator('[data-family="encoder"]').focus();await page.keyboard.press('Enter');await expect(lab.locator('[data-family="encoder"]')).toHaveAttribute('aria-pressed','true');expect(errors).toEqual([]);
+});
+
+test('agent reliability separates at-least-one success from all-attempt success',async({page},info)=>{
+ await page.goto('/notes/agent-evaluation/');const lab=page.locator('#view-notes .agent-evaluation-lab');
+ await expect(lab.locator('[data-agent-metric="completion"]')).toContainText('20 / 32');
+ await lab.locator('[data-trial-task="1"]').click();await expect(lab.locator('.trial-inspector')).toContainText('3 successes in 4 trials.');
+ await expect(lab.locator('.trial-inspector dd').nth(0)).toHaveText('100.0%');await expect(lab.locator('.trial-inspector dd').nth(1)).toHaveText('50.0%');
+ await setRange(page,'#view-notes [data-attempts]',4);await expect(lab.locator('[data-agent-metric="pass-at"] strong')).toHaveText('87.5%');await expect(lab.locator('[data-agent-metric="pass-all"] strong')).toHaveText('25.0%');
+ await lab.locator('[data-agent-variant]').selectOption('reviewer');await expect(lab.locator('[data-agent-metric="completion"]')).toContainText('18 / 32');
+ await lab.locator('[data-agent-variant]').selectOption('gated');await expect(lab.locator('[data-agent-metric="completion"]')).toContainText('24 / 32');
+ await noOverflow(page);await shot(page,info,'agent-evaluation-full');
+ const edges=await page.evaluate(()=>[PortfolioResearch.reliability([0],4,2),PortfolioResearch.reliability([4],4,2)]);
+ expect(edges[0]).toEqual({passAt:0,passAll:0,passOne:0});expect(edges[1]).toEqual({passAt:1,passAll:1,passOne:1});
+});
+
+test('model-pool experiment preserves outcome counts and handles no recoverable misses',async({page},info)=>{
+ await page.goto('/notes/model-pools/');const lab=page.locator('#view-notes .model-pool-lab');await expect(lab.locator('[data-pool-final]')).toHaveText('77%');
+ await expect(lab.locator('.pool-case-grid i')).toHaveCount(100);await expect(lab.locator('.pool-case-grid .spoiled')).toHaveCount(8);
+ await setRange(page,'#view-notes [data-pool-control="available"]',0);await expect(lab.locator('[data-pool-control="recovered"]')).toHaveValue('0');await expect(lab.locator('.pool-diagnostics')).toContainText('N/A');
+ await setRange(page,'#view-notes [data-pool-control="spoiled"]',80);await expect(lab.locator('[data-pool-final]')).toHaveText('0%');
+ await setRange(page,'#view-notes [data-pool-control="available"]',20);await setRange(page,'#view-notes [data-pool-control="recovered"]',20);await setRange(page,'#view-notes [data-pool-control="spoiled"]',0);await expect(lab.locator('[data-pool-final]')).toHaveText('100%');
+ await noOverflow(page);await shot(page,info,'model-pools-full');
+});
+
+test('new papers and research guides are linked and readable without JavaScript',async({page,browser},info)=>{
+ await page.goto('/#notes');await expect(page.locator('#paper-count')).toHaveText('21 references');await page.locator('[data-paper-filter="Agents"]').click();await expect(page.locator('#paper-shelf .paper-item')).toHaveCount(4);
+ await expect(page.locator('#paper-shelf a[href="https://arxiv.org/abs/2609.17306"]')).toBeVisible();await page.locator('#paper-shelf .paper-item').first().getByRole('link',{name:'Related explainer'}).click();await expect(page.locator('#view-notes h1')).toContainText('A better answer');
+ await page.goto('/notes/encoder-decoder/');await expect(page.locator('#view-notes .architecture-explorer')).toBeVisible();await noOverflow(page);await shot(page,info,'encoder-decoder-full');
+ const context=await browser.newContext({javaScriptEnabled:false,baseURL:test.info().project.use.baseURL||'http://127.0.0.1:4173'}),plain=await context.newPage();
+ for(const slug of ['agent-evaluation','model-pools','encoder-decoder']){await plain.goto('/notes/'+slug+'/');await expect(plain.locator('#view-notes .article-section')).toHaveCount(5);await expect(plain.locator('#article-widget')).not.toBeEmpty();}
+ await context.close();
 });
 
 test('all four architecture studies expose inspectable components and readable layouts',async({page},info)=>{
