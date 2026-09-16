@@ -1,1 +1,8 @@
 implementation-notes.md
+
+# Local build and browser evidence
+node_modules/
+_site/
+playwright-report/
+test-results/
+screenshots/

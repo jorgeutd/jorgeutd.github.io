@@ -1,0 +1,13 @@
+{
+  "name": "jorge-grisman-portfolio",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build-site.cjs",
+    "test": "playwright test",
+    "serve": "node scripts/serve-site.cjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  }
+}
