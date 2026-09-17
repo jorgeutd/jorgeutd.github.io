@@ -1,13 +1,21 @@
 {
-  "name": "Jorge Grisman — Principal AI Engineer",
+  "name": "Jorge Grisman — Applied AI & Systems",
   "short_name": "Jorge Grisman",
-  "description": "Principal AI Engineer focused on AI agents and LLM inference.",
+  "description": "Applied AI, agents, inference systems, and research.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0b0f1a",
-  "theme_color": "#0b0f1a",
+  "background_color": "#fafbf8",
+  "theme_color": "#203b32",
   "icons": [
-    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" },
-    { "src": "/favicon.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "/icon-192.png?v=a7daf89155",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png?v=a7daf89155",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }
