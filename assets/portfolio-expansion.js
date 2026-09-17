@@ -21,7 +21,7 @@ function githubProjects(){return `<section class="section"><div class="section-h
 function addViews() {
  for(const [name,label] of [['demos','Interactive demos'],['models','Open models']]) {
   viewLabels[name]=label;
-  const node=document.createElement('div');node.className='view';node.id='view-'+name;node.hidden=true;el('main').insertBefore(node,el('main').querySelector(':scope > footer'));
+  if(!el('view-'+name)){const node=document.createElement('div');node.className='view';node.id='view-'+name;node.hidden=true;el('main').insertBefore(node,el('main').querySelector(':scope > footer'));}
  }
  const nav=el('sidebar').querySelector('nav');
  for(const [name,label,icon] of [['demos','Interactive demos','i-box'],['models','Open models','i-lab']]) {

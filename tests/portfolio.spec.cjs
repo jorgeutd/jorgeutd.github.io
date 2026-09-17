@@ -7,7 +7,7 @@ async function setRange(page,selector,value){await page.locator(selector).evalua
 async function noOverflow(page){expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();}
 test('homepage, copyright, public project links and top compatibility',async({page},info)=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/#top');
- await expect(page.locator('#view-overview')).toBeVisible();await expect(page.locator('.hero h1')).toContainText('From first principles');await expect(page.locator('.footer')).toContainText('© 2021–2026 Jorge Grisman');
+ await expect(page.locator('#view-overview')).toBeVisible();await expect(page.locator('.hero h1')).toContainText('From fine-tuning');await expect(page.locator('.footer')).toContainText('© 2021–2026 Jorge Grisman');
  await expect(page.locator('.hero a[href="https://github.com/jorgeutd"]')).toBeVisible();await expect(page.locator('body')).not.toContainText('DESIGN CONCEPT');
  await noOverflow(page);await shot(page,info,'home');expect(errors).toEqual([]);
 });
