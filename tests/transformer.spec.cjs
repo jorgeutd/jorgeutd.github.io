@@ -41,6 +41,7 @@ test('transformer workbench connects tokens, head selection and masked pair insp
  const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/#research/transformer');const root=page.locator('#transformer-anatomy');
  await expect(root.locator('[data-tf-cell]')).toHaveCount(36);await expect(root.locator('.masked')).toHaveCount(15);await expect(root.locator('.tf-row-sum')).toContainText('1.000000');
  await expect(root.locator(isMobile?'.tf-mobile-flow':'.tf-map')).toBeVisible();await capture(page,info,'attention');
+ if(!isMobile){const positions=await root.locator('.tf-map [y]').evaluateAll(nodes=>nodes.map(n=>Number(n.getAttribute('y'))));expect(positions.every(Number.isFinite)).toBeTruthy();await expect(root.locator('.tf-svg-token')).toHaveCount(10);const ys=await root.locator('.tf-svg-token').evaluateAll(nodes=>nodes.slice(0,6).map(n=>n.getBBox().y));expect(new Set(ys).size).toBe(6);}
  const before=await root.locator('[data-tf-weight]').innerText();await root.locator('[data-tf-head="1"]').click();await expect(root.locator('[data-tf-weight]')).not.toHaveText(before);
  await root.locator('[data-tf-cell="1,4"]').click();await expect(root.locator('[data-tf-weight]')).toHaveText('0.0%');await expect(root.locator('.tf-calculation')).toContainText('−∞');
  await root.locator('[data-tf-token="0"]').click();await expect(root.locator('.query-row:not(.masked)')).toHaveCount(1);await root.locator('[data-tf-cell="0,0"]').focus();await page.keyboard.press('Enter');await expect(root.locator('[data-tf-weight]')).toHaveText('100.0%');
