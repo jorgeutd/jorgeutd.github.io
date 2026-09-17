@@ -82,7 +82,7 @@ jobs:
         run: |
           node <<'NODE'
           const fs = require('node:fs');
-          const paths = ['index.html', 'assets/portfolio-content.js', 'assets/portfolio-expansion.js', 'assets/portfolio-expansion.css', 'assets/portfolio-atlas.js', 'assets/portfolio-atlas.css', 'assets/portfolio-research.js', 'assets/portfolio-research.css'];
+          const paths = ['index.html', 'assets/portfolio-content.js', 'assets/portfolio-expansion.js', 'assets/portfolio-expansion.css', 'assets/portfolio-atlas.js', 'assets/portfolio-atlas.css', 'assets/portfolio-research.js', 'assets/portfolio-research.css', 'assets/portfolio-transformer.js', 'assets/portfolio-transformer.css', 'favicon.svg', 'site.webmanifest'];
           (async () => {
             for (let attempt = 0; attempt < 30; attempt++) {
               const matches = await Promise.all(paths.map(async path => {

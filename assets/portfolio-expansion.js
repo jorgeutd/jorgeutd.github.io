@@ -21,7 +21,7 @@ function githubProjects(){return `<section class="section"><div class="section-h
 function addViews() {
  for(const [name,label] of [['demos','Interactive demos'],['models','Open models']]) {
   viewLabels[name]=label;
-  const node=document.createElement('div');node.className='view';node.id='view-'+name;node.hidden=true;el('main').insertBefore(node,el('main').querySelector('footer'));
+  const node=document.createElement('div');node.className='view';node.id='view-'+name;node.hidden=true;el('main').insertBefore(node,el('main').querySelector(':scope > footer'));
  }
  const nav=el('sidebar').querySelector('nav');
  for(const [name,label,icon] of [['demos','Interactive demos','i-box'],['models','Open models','i-lab']]) {
@@ -43,8 +43,6 @@ function addViews() {
  const research=el('view-research');research.querySelector('.page-intro p:last-child').textContent='Mechanisms, worked examples, and the papers behind them. Explore transformer structure, compute cache payload, or continue into sampling, tracing, and evaluation.';
  research.querySelectorAll('.note .tag').forEach(n=>n.textContent='Interactive note');
   research.querySelector('.section-head h2').textContent='Follow the mechanism into a working example.';
- research.querySelector('.lab-top .tag').textContent='Interactive mechanism';
- research.querySelector('.lab-foot').textContent='A guided explanation of the decoder path. The geometry is illustrative; numerical tensors and model execution are outside this schematic.';
  research.insertAdjacentHTML('beforeend',`<section class="section"><div class="section-head"><div><span class="section-number">READ / QUESTION / APPLY</span><h2>Papers behind the work.</h2><p>Primary sources, with a practical question to carry into each one.</p></div>${link('Browse the collection →','#notes')}</div><div class="paper-shelf">${C.papers.slice(0,4).map(paperCard).join('')}</div></section>`);
  document.querySelector('.concept-badge').textContent=document.body.dataset.preview==='false'?'APPLIED AI / SYSTEMS':'DESIGN CONCEPT · 02';
  document.querySelectorAll('#systems-list .work-row').forEach((row,i)=>{if(i<2){const key=['memory','evaluation'][i];const a=document.createElement('a');a.className='text-link';a.href='#demos/'+key;a.textContent='Explore the related lab →';row.querySelector('div').append(a);}});
@@ -178,6 +176,7 @@ function renderBatching(mount){
 function renderGenericArchitecture(mount){window.PortfolioAtlas.render(mount);}
 
 addViews();
-window.renderPortfolioRoute=(name,detail)=>{stopArchitecture();for(const route of ['demos','notes','models'])if(name!==route)el('view-'+route).replaceChildren();if(name==='demos')return renderDemos(detail);if(name==='notes')return renderNotes(detail);if(name==='models')return renderModels();};
+window.renderPortfolioRoute=(name,detail)=>{stopArchitecture();for(const route of ['demos','notes','models'])if(name!==route)el('view-'+route).replaceChildren();if(name==='research'&&detail==='transformer')requestAnimationFrame(()=>document.getElementById('transformer-anatomy').scrollIntoView({block:'start'}));
+ if(name==='demos')return renderDemos(detail);if(name==='notes')return renderNotes(detail);if(name==='models')return renderModels();};
 navigate();
 })();
