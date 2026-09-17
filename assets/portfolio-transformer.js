@@ -132,7 +132,7 @@
     if(ids.length>=10)return;const ranked=distribution(m.logits.at(-1),temp,topk),u=((sampleSeed=(Math.imul(sampleSeed,1664525)+1013904223)>>>0)/4294967296);let total=0;const chosen=ranked.find(r=>(total+=r.p)>u)||ranked.findLast(r=>r.p>0);ids.push(chosen.id);m=forward(ids);query=ids.length-1;comparison=null;sequence();el('[data-tf-status]').textContent=`Appended ${VOCAB[chosen.id]}. Sequence now has ${ids.length} tokens.`;
    }else return;update();
   });
-  root.addEventListener('input',e=>{if(e.target.hasAttribute('data-tf-temperature')){temp=+e.target.value; e.target.previousElementSibling.textContent=temp.toFixed(2);const holder=document.createElement('div');holder.innerHTML=decoding();el('.tf-probabilities').replaceWith(holder.querySelector('.tf-probabilities'));el('[data-tf-map]').innerHTML=diagram(m,stage,distribution(m.logits.at(-1),temp,topk));}});
+  root.addEventListener('input',e=>{if(e.target.hasAttribute('data-tf-temperature')){temp=+e.target.value; e.target.previousElementSibling.textContent=temp.toFixed(2);const holder=document.createElement('div');holder.innerHTML=decoding();el('.tf-probabilities').replaceWith(holder.querySelector('.tf-probabilities'));el('[data-tf-map]').innerHTML=diagram(m,stage,distribution(m.logits.at(-1),temp,topk));guide();}});
   root.addEventListener('change',e=>{if(e.target.hasAttribute('data-tf-prompt'))reset();if(e.target.hasAttribute('data-tf-k')){topk=+e.target.value;update();}});
   sequence();update();
  }
