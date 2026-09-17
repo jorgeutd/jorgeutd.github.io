@@ -15,7 +15,7 @@
     ['Reproduce the workflow','Start a model endpoint with tool support, install the project, run the suite, and retain the run JSON alongside its report. For a quantization comparison, hold the task suite, prompt/template, runtime, sampling configuration, and hardware fixed. Record the model and tokenizer revision separately when the serving endpoint does not expose them.'],
     ['Evidence and limits','The linked code provides the task suite, scoring rules, aggregation, and tests. The README’s example percentages are illustrative output, not a verified model-quality benchmark. This portfolio does not claim that the suite certifies production readiness. A release evaluation also needs representative held-out tasks, policy checks, end-to-end traces, and operational failure cases.']
    ],
-   command:'pip install -e ".[dev]"\nlabench run --base-url http://localhost:8080/v1 \\\n  --model YOUR_MODEL --out runs/baseline.json\nlabench report runs/baseline.json --out reports/baseline.md',
+   command:'git clone https://github.com/jorgeutd/local-agent-bench.git\ncd local-agent-bench\ngit checkout e42c288e8cd4d1a7d66e93115b65426262ff8317\npip install -e ".[dev]"\nlabench run --base-url http://localhost:8080/v1 \\\n  --model YOUR_MODEL --out runs/baseline.json\nlabench report runs/baseline.json --out reports/baseline.md',
    evidence:[['Task definitions','tasks/core.yaml'],['Runner','src/labench/runner.py'],['Scoring rules','src/labench/scoring.py'],['Statistics','src/labench/stats.py'],['Scoring tests','tests/test_scoring.py']],lab:'/labs/evaluation/'
   },
   'llm-inference-starters':{
@@ -29,7 +29,7 @@
     ['Reproduce the workflow','Choose a recipe compatible with your hardware, serve a pinned model, and probe the endpoint before benchmarking it. Keep prompt, output limit, concurrency, model/tokenizer, quantization, runtime version, and warm-up policy comparable. Save the complete environment with the report; a number without that context is difficult to reproduce.'],
     ['Evidence and limits','The linked parser, timing functions, and tests make the measurement contract inspectable. The README’s sample timings illustrate the report format; they are not measured results from this portfolio release. Client-observed timings include transport and streaming behavior. A complete serving evaluation should add realistic concurrent load, prefill/decode profiling, tail latency, memory use, and task-quality checks.']
    ],
-   command:'pip install -e common/\nllmstart probe --base-url http://localhost:8080/v1\nllmstart bench --base-url http://localhost:8080/v1 \\\n  --model YOUR_MODEL --requests 5 --max-tokens 128',
+   command:'git clone https://github.com/jorgeutd/llm-inference-starters.git\ncd llm-inference-starters\ngit checkout 37cd39edc8eebe03a73ba2b2b6e110088d9e8f5d\npip install -e common/\nllmstart probe --base-url http://localhost:8080/v1\nllmstart bench --base-url http://localhost:8080/v1 \\\n  --model YOUR_MODEL --requests 5 --max-tokens 128',
    evidence:[['Timing contract','common/src/llmstart/metrics.py'],['Stream parsing','common/src/llmstart/streaming.py'],['Timing tests','common/tests/test_metrics.py'],['Parser tests','common/tests/test_streaming.py'],['Engine decisions','docs/choosing-an-engine.md']],lab:'/labs/memory/'
   }
  };

@@ -5,7 +5,7 @@ async function noOverflow(page){expect(await page.evaluate(()=>document.document
 
 test('professional introduction and linked lifecycle remain readable across themes',async({page,isMobile},info)=>{
  await page.goto('/');await expect(page.locator('.hero .eyebrow')).toHaveText('Staff / Principal AI Engineer');await expect(page.locator('.engineering-map-grid>a')).toHaveCount(4);await expect(page.locator('.impact-strip')).toContainText('Quantum Health · platform reach');await expect(page.locator('#hero-model')).toHaveCount(0);await noOverflow(page);await shot(page,info,'overview');
- await page.locator('.engineering-map-bottom a').click();await expect(page.locator('#view-about')).toBeVisible();await expect(page.locator('#view-about .about-columns')).toContainText('Staff / Principal AI Engineer');await noOverflow(page);await shot(page,info,'about');
+ await page.locator('.engineering-map-bottom a').click();await expect(page.locator('#view-about')).toBeVisible();await expect(page.locator('#view-about .about-columns')).toContainText('Staff / Principal AI Engineer');await expect(page.locator('#view-about .about-columns')).toContainText('technology, industrial distribution, insurance, and healthcare');await noOverflow(page);await shot(page,info,'about');
  if(isMobile)await page.locator('#menu-toggle').click();await page.locator('#theme-toggle').click();if(isMobile)await page.locator('#scrim').click({position:{x:page.viewportSize().width-10,y:30}});await page.goto('/');await shot(page,info,'overview-dark');
 });
 
@@ -32,7 +32,7 @@ test('pretrained model is opt-in and download failure leaves a retryable interfa
 
 test('pinned pretrained model returns real tokens and vocabulary-normalized probabilities',async({page,isMobile},info)=>{
  test.setTimeout(240000);
- const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/labs/pretrained/');await page.locator('[data-pretrained-load]').click();await expect(page.locator('[data-pretrained-run]')).toBeEnabled({timeout:180000});
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/labs/pretrained/');await page.locator('[data-pretrained-load]').click();await page.waitForFunction(()=>!document.querySelector('[data-pretrained-run]').disabled||document.querySelector('.pretrained-status').classList.contains('is-error'),null,{timeout:180000});expect(await page.locator('.pretrained-status').textContent()).not.toMatch(/Could not|could not|timed out/);await expect(page.locator('[data-pretrained-run]')).toBeEnabled();
  await page.locator('[data-pretrained-run]').click();await expect(page.locator('.pretrained-status')).toContainText('Forward pass complete',{timeout:60000});await expect(page.locator('.pretrained-token-list span')).not.toHaveCount(0);await expect(page.locator('.pretrained-run-info')).toContainText('50,257');await expect(page.locator('.pretrained-probs>.pretrained-prob')).toHaveCount(12);
  const before=await page.locator('textarea').inputValue();await page.locator('[data-pretrained-append]').click();await expect(page.locator('.pretrained-status')).toContainText('Forward pass complete',{timeout:60000});expect((await page.locator('textarea').inputValue()).length).toBeGreaterThan(before.length);await noOverflow(page);await shot(page,info,'pretrained-results');
  await page.locator('[data-pretrained-cancel]').click();await expect(page.locator('[data-pretrained-load]')).toBeEnabled();expect(errors).toEqual([]);

@@ -1,7 +1,7 @@
 // Optional browser inference. Model identity and runtime are pinned for reproducibility.
 const MODEL='Xenova/distilgpt2';
 const REVISION='a41c10485c18a64b6606729b6a082330cbd8f49e';
-const RUNTIME='https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/dist/transformers.web.js';
+const RUNTIME='https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/dist/transformers.min.js';
 let tokenizer,model,busy=false;
 const send=(type,body={})=>postMessage({type,...body});
 async function load(){
@@ -24,10 +24,10 @@ async function infer(text){
  const candidates=ranked.map(row=>({...row,piece:tokenizer.decode([row.id],{skip_special_tokens:false})}));
  const max=Math.max(...logits),sum=logits.reduce((s,v)=>s+Math.exp(v-max),0);
  const probabilities=candidates.map(r=>({...r,p:Math.exp(r.logit-max)/sum}));
- // Transfer plain values, then release tensors from this full-sequence forward pass.
- send('result',{tokens,probabilities,logits:Float32Array.from(logits),inferenceMs,vocabularySize:width,model:MODEL,revision:REVISION,text});
+ // Release the forward-pass tensors before allowing another request.
  const seen=new Set();const dispose=async obj=>{if(!obj||typeof obj!=='object'||seen.has(obj))return;seen.add(obj);if(typeof obj.dispose==='function'){await obj.dispose();return;}for(const v of Object.values(obj))await dispose(v);};
  await dispose(outputs);await dispose(inputs);
+ send('result',{tokens,probabilities,logits:Float32Array.from(logits),inferenceMs,vocabularySize:width,model:MODEL,revision:REVISION,text});
 }
 onmessage=async({data})=>{
  if(busy)return;busy=true;
