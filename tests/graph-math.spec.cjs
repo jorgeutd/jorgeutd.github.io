@@ -15,3 +15,7 @@ test('permutation changes indexing but not graph computations',()=>{
 test('locality prevents a disconnected intervention from changing one-hop state',()=>{
  const a=M.run('gcn',false),b=M.run('gcn',true);expect(a.states[1][7]).toEqual(b.states[1][7]);expect(a.states[1][3]).not.toEqual(b.states[1][3]);expect(M.reach(3,a.links,2)).toContain(0);
 });
+test('GATv2 can reverse the ordering of the same neighbors when the receiving features change',()=>{
+ const order=q=>M.step([q,M.nodes[0].h,M.nodes[1].h],[[0,1],[0,2]],'gatv2').details[0].raw.slice(1);
+ const a=order(M.nodes[0].h),b=order(M.nodes[1].h);expect(a[0]).toBeGreaterThan(a[1]);expect(b[0]).toBeLessThan(b[1]);
+});

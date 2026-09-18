@@ -1,0 +1,169 @@
+{
+  "format": "portfolio-social-cards-v1",
+  "width": 1200,
+  "height": 630,
+  "pages": [
+    {
+      "route": "/",
+      "title": "From fine-tuning to production.",
+      "asset": "assets/social/portfolio-b3231a10b1.png",
+      "alt": "From fine-tuning to production. — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/notes/agent-evaluation/",
+      "title": "Measure the outcome. Then explain the trajectory.",
+      "asset": "assets/social/notes-agent-evaluation-27a808179b.png",
+      "alt": "Measure the outcome. Then explain the trajectory. — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/notes/encoder-decoder/",
+      "title": "Encoder, decoder, or both? Start with the output.",
+      "asset": "assets/social/notes-encoder-decoder-43ac7da641.png",
+      "alt": "Encoder, decoder, or both? Start with the output. — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/notes/evaluation/",
+      "title": "A score needs a chain of evidence.",
+      "asset": "assets/social/notes-evaluation-4b866c7b57.png",
+      "alt": "A score needs a chain of evidence. — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/notes/graph-neural-networks/",
+      "title": "When relationships become the model.",
+      "asset": "assets/social/notes-graph-neural-networks-b342a6bfa6.png",
+      "alt": "When relationships become the model. — connected evidence and message passing. Jorge Grisman."
+    },
+    {
+      "route": "/notes/inference/",
+      "title": "The cache is part of the architecture.",
+      "asset": "assets/social/notes-inference-b77f231027.png",
+      "alt": "The cache is part of the architecture. — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/notes/model-mechanics/",
+      "title": "From logits to the next token.",
+      "asset": "assets/social/notes-model-mechanics-a1d3215cc1.png",
+      "alt": "From logits to the next token. — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/notes/model-pools/",
+      "title": "A better answer in the pool is only the beginning.",
+      "asset": "assets/social/notes-model-pools-5a3d95dd8f.png",
+      "alt": "A better answer in the pool is only the beginning. — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/notes/release/",
+      "title": "A release is a reproducible decision.",
+      "asset": "assets/social/notes-release-fcaad2e9ee.png",
+      "alt": "A release is a reproducible decision. — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/notes/system-design/",
+      "title": "Start with the constraints. Make the boundaries visible.",
+      "asset": "assets/social/notes-system-design-247e7cbfb7.png",
+      "alt": "Start with the constraints. Make the boundaries visible. — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/notes/tracing/",
+      "title": "A trace should explain the execution.",
+      "asset": "assets/social/notes-tracing-3227c7773d.png",
+      "alt": "A trace should explain the execution. — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/labs/architecture/",
+      "title": "System design atlas",
+      "asset": "assets/social/labs-architecture-235c61a9d4.png",
+      "alt": "System design atlas — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/labs/batching/",
+      "title": "Batch scheduling",
+      "asset": "assets/social/labs-batching-2e605ac529.png",
+      "alt": "Batch scheduling — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/labs/evaluation/",
+      "title": "Evaluation & uncertainty",
+      "asset": "assets/social/labs-evaluation-4add2ed072.png",
+      "alt": "Evaluation & uncertainty — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/labs/graphs/",
+      "title": "Graph neural networks",
+      "asset": "assets/social/labs-graphs-641e2af102.png",
+      "alt": "Graph neural networks — connected evidence and message passing. Jorge Grisman."
+    },
+    {
+      "route": "/labs/memory/",
+      "title": "Inference memory",
+      "asset": "assets/social/labs-memory-17aa3d6429.png",
+      "alt": "Inference memory — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/labs/pretrained/",
+      "title": "Pretrained model lab",
+      "asset": "assets/social/labs-pretrained-cfaf7526c6.png",
+      "alt": "Pretrained model lab — tokenization, a browser model and next-token scores. Jorge Grisman."
+    },
+    {
+      "route": "/labs/sampling/",
+      "title": "Token sampling",
+      "asset": "assets/social/labs-sampling-82427a8dfa.png",
+      "alt": "Token sampling — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/labs/tracing/",
+      "title": "Trace explorer",
+      "asset": "assets/social/labs-tracing-7c7e761931.png",
+      "alt": "Trace explorer — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/labs/transformer/",
+      "title": "Transformer anatomy",
+      "asset": "assets/social/labs-transformer-3e36e30b17.png",
+      "alt": "Transformer anatomy — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/work/graph-evidence-lab/",
+      "title": "Does the graph earn its place in retrieval?",
+      "asset": "assets/social/work-graph-evidence-lab-f90dfa4fab.png",
+      "alt": "Does the graph earn its place in retrieval? — connected evidence and message passing. Jorge Grisman."
+    },
+    {
+      "route": "/work/llm-inference-starters/",
+      "title": "Make inference comparisons reproducible.",
+      "asset": "assets/social/work-llm-inference-starters-cae64d488c.png",
+      "alt": "Make inference comparisons reproducible. — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/work/local-agent-bench/",
+      "title": "Can a smaller model still use the right tool?",
+      "asset": "assets/social/work-local-agent-bench-1b25efbd7f.png",
+      "alt": "Can a smaller model still use the right tool? — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/deep-dives/",
+      "title": "Papers & Deep Dives — LLM Internals",
+      "asset": "assets/social/deep-dives-4abc637f13.png",
+      "alt": "Papers & Deep Dives — LLM Internals — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/inference/",
+      "title": "Inference Lab — KV Caching & SOTA LLM Serving",
+      "asset": "assets/social/inference-c2c294110f.png",
+      "alt": "Inference Lab — KV Caching & SOTA LLM Serving — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/evals/",
+      "title": "How I Evaluate Production AI Systems — Evals, Observability & Governance",
+      "asset": "assets/social/evals-c31c644b4f.png",
+      "alt": "How I Evaluate Production AI Systems — Evals, Observability & Governance — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/systems/",
+      "title": "System Design & Architecture — Production AI Case Studies",
+      "asset": "assets/social/systems-12b556ee46.png",
+      "alt": "System Design & Architecture — Production AI Case Studies — models, mechanisms and systems. Jorge Grisman."
+    }
+  ]
+}

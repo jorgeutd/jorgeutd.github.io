@@ -5,9 +5,12 @@
   "scripts": {
     "build": "node scripts/build-site.cjs",
     "test": "playwright test",
-    "serve": "node scripts/serve-site.cjs"
+    "serve": "node scripts/serve-site.cjs",
+    "previews": "node scripts/generate-social-previews.cjs"
   },
   "devDependencies": {
-    "@playwright/test": "1.63.0"
+    "@playwright/test": "1.63.0",
+    "jsdom": "26.1.0",
+    "sharp": "0.35.4"
   }
 }
