@@ -58,6 +58,100 @@ window.PORTFOLIO_CONTENT = {
   ],
   "articles": [
     {
+      "slug": "inference-topology",
+      "category": "Inference / architecture",
+      "title": "Make inference capacity earn its cost.",
+      "deck": "Match the serving architecture to the workload. Measure queueing, first-token latency, and the completed response before adding another service.",
+      "read": "3 min · September 2026",
+      "widget": "inference-topology",
+      "sections": [
+        [
+          "01 / The delivery decision",
+          "An AI feature needs a latency target, a quality threshold and a capacity budget. My starting point is the complete request: input processing, model execution, waiting and response delivery. I would compare architectures against the same workload and resource envelope, then check whether the added operational complexity earns its place."
+        ],
+        [
+          "02 / A current engineering example",
+          "NVIDIA’s September 2026 article separates vision encoding from LLM prefill/decode workers. Independent queues can keep text requests from waiting behind image processing. Encoder workers can share GPUs or use a separate hardware tier. The useful lesson is conditional: transfer overhead, output length and hardware placement determine whether the split helps.",
+          [
+            [
+              "NVIDIA · engineering article · 9 September 2026",
+              "https://developer.nvidia.com/blog/when-to-use-encode-prefill-decode-disaggregation-to-accelerate-multimodal-model-serving/"
+            ]
+          ]
+        ],
+        [
+          "03 / Inspect the tradeoff",
+          "The original example below compares shared workers with a dedicated encoder pool under the same total GPU count. Change image load, response length or arrival rate. Inspect the same request in both layouts. Each number is computed from visible assumptions; the experiment illustrates queueing and capacity allocation rather than predicting a production engine."
+        ],
+        [
+          "04 / Optimize the whole response",
+          "Quantization can change the balance between stages, so I would re-profile after every model or precision change. First-token latency, inter-token latency, completed-request latency and task quality answer different questions. A faster opening token is valuable, but the response still has to finish correctly. In the example, the faster-LLM control changes service times only; it makes no quality claim."
+        ],
+        [
+          "05 / What I would validate before release",
+          "Use a representative request distribution, pinned model and runtime, warm and cold runs, bounded queues, and a clear rejection policy. Record hardware cost alongside throughput and tail latency. Test task quality after quantization. Keep the simpler layout as a baseline, and verify rollback when a topology or model version misses its operating target."
+        ]
+      ],
+      "sources": [
+        [
+          "NVIDIA · When to Use Encode-Prefill-Decode Disaggregation · 9 September 2026",
+          "https://developer.nvidia.com/blog/when-to-use-encode-prefill-decode-disaggregation-to-accelerate-multimodal-model-serving/"
+        ],
+        [
+          "My public inference measurement project",
+          "https://github.com/jorgeutd/llm-inference-starters"
+        ]
+      ],
+      "sourceNote": "A compact engineering approach by Jorge Grisman, informed by a vendor-authored engineering article. The linked article reports its own hardware experiments. This portfolio’s simulator is independently authored, uses synthetic service times and does not reproduce those benchmarks. Reviewed 18 September 2026."
+    },
+    {
+      "slug": "agent-recovery",
+      "category": "Agents / production architecture",
+      "title": "Keep the outcome when a worker fails.",
+      "deck": "Design agent workflows around durable progress, explicit tool contracts, and evidence that explains both success and failure.",
+      "read": "3 min · September 2026",
+      "widget": "agent-recovery",
+      "sections": [
+        [
+          "01 / The delivery decision",
+          "A useful agent has to finish the intended task and leave a result a team can trust. I would define who owns workflow progress, which actions change external state, and how an interrupted run resumes. Those boundaries become part of the application contract, alongside the model, tools, evaluation and user experience."
+        ],
+        [
+          "02 / A current engineering example",
+          "Anthropic’s April 2026 architecture separates the orchestration loop, durable session history and tool execution environments. Workers can be replaced without treating their local memory as the source of truth. Keeping the session log outside the context window also separates recoverable history from the context selected for a particular model call.",
+          [
+            [
+              "Anthropic · engineering article · 8 April 2026",
+              "https://www.anthropic.com/engineering/managed-agents"
+            ]
+          ]
+        ],
+        [
+          "03 / Test an ambiguous outcome",
+          "My example focuses on one independently authored failure: a report is saved externally, then the worker disappears before recording the receipt. The next worker sees an unfinished tool intent. Retrying with the same action key is safe only when the destination implements atomic deduplication. Turn that contract off to see a duplicate write despite a completed workflow."
+        ],
+        [
+          "04 / Make recovery inspectable",
+          "Retain the logical action ID across delivery attempts, and give each attempt its own trace span. Store committed progress separately from telemetry. In a production design I would also specify leases or fencing for concurrent workers, payload-conflict checks, bounded retries, timeouts, and a reconciliation path for tools that cannot deduplicate."
+        ],
+        [
+          "05 / Evaluate the delivered outcome",
+          "I would test final task correctness, duplicate side effects, missing results, recovery delay and manual intervention. A completed trace alone cannot establish that the business outcome is correct. The interactive example makes that distinction visible: two external writes can sit behind one apparently successful response."
+        ]
+      ],
+      "sources": [
+        [
+          "Anthropic · Scaling Managed Agents · 8 April 2026",
+          "https://www.anthropic.com/engineering/managed-agents"
+        ],
+        [
+          "My public tool-use evaluation project",
+          "https://github.com/jorgeutd/local-agent-bench"
+        ]
+      ],
+      "sourceNote": "A compact engineering approach by Jorge Grisman, informed by an engineering case study. The report-saving scenario, event model and idempotency experiment are original teaching examples. They do not represent an employer architecture or imply exactly-once delivery. Reviewed 18 September 2026."
+    },
+    {
       "slug": "graph-neural-networks",
       "category": "Graphs",
       "title": "When relationships become the model.",
@@ -771,6 +865,22 @@ window.PORTFOLIO_CONTENT = {
     }
   ],
   "papers": [
+    [
+      "Inference",
+      "When to Use Encode-Prefill-Decode Disaggregation",
+      "9 Sep 2026 · engineering article",
+      "When do separate encoder workers justify their transfer and scheduling overhead?",
+      "https://developer.nvidia.com/blog/when-to-use-encode-prefill-decode-disaggregation-to-accelerate-multimodal-model-serving/",
+      "inference-topology"
+    ],
+    [
+      "Systems",
+      "Scaling Managed Agents",
+      "8 Apr 2026 · engineering article",
+      "Separate recoverable session history from orchestration and execution environments.",
+      "https://www.anthropic.com/engineering/managed-agents",
+      "agent-recovery"
+    ],
     [
       "Graphs",
       "G-Retriever",
