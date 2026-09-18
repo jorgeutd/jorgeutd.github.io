@@ -22,6 +22,7 @@ dialog{background:var(--paper);color:var(--ink);border:1px solid var(--line);bor
 <link href="assets/portfolio-atlas.css?v=62247efe69" rel="stylesheet">
 <link rel="stylesheet" href="assets/portfolio-research.css?v=bb73ab80d1"><link rel="stylesheet" href="assets/portfolio-transformer.css?v=9e545ef873">
 <link rel="stylesheet" href="assets/portfolio-delivery.css?v=1a1dbfa885">
+<link rel="stylesheet" href="assets/portfolio-graphs.css?v=c3c7faf9aa">
 <meta name="description" content="A task-level evaluation harness for tool choice, argument correctness, abstention, and structured outputs—with uncertainty attached to the result.">
 <meta name="author" content="Jorge Grisman">
 <meta name="theme-color" content="#fafbf8">
@@ -240,10 +241,12 @@ function setTheme(theme){document.documentElement.dataset.theme=theme;$('theme-t
 $('theme-toggle').addEventListener('click',()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));try{setTheme(localStorage.getItem('portfolio-concept-theme')||'light');}catch{}
 updateMemory();navigate();
 </script>
-<script src="assets/portfolio-content.js?v=6e8a6786cf"></script>
+<script src="assets/portfolio-content.js?v=e45c630b80"></script>
 <script src="assets/portfolio-atlas.js?v=670810bb65"></script><script src="assets/portfolio-research.js?v=5dc6865532"></script>
 <script src="assets/portfolio-transformer.js?v=9527a3ddc9"></script>
-<script src="assets/portfolio-expansion.js?v=268a5ee934"></script>
-<script src="assets/portfolio-delivery.js?v=2904836e67"></script>
+<script src="assets/portfolio-expansion.js?v=a5f3fc6b5f"></script>
+<script src="assets/portfolio-delivery.js?v=52123e09dc"></script>
+<script src="assets/portfolio-graph-math.js?v=01c2985c5a"></script>
+<script src="assets/portfolio-graphs.js?v=5daa9e2dca"></script>
 
 </body></html>

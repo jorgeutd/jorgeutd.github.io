@@ -1,4 +1,4 @@
-/* Public model references and general engineering explainers. */
+/* Public model references and original engineering explainers. */
 window.PORTFOLIO_CONTENT = {
   "models": [
     {
@@ -57,6 +57,231 @@ window.PORTFOLIO_CONTENT = {
     }
   ],
   "articles": [
+    {
+      "slug": "graph-neural-networks",
+      "category": "Graphs",
+      "title": "When relationships become the model.",
+      "deck": "A practical research guide to graph neural networks: message passing, architecture choices, useful applications, and the connection to LLM retrieval. Follow the mathematics in 3D, then inspect a trained public project.",
+      "read": "15 min read · reviewed 18 September 2026",
+      "widget": "graphs",
+      "sections": [
+        [
+          "01 / Start with the decision",
+          "A graph neural network is useful when relationships carry information that independent rows would lose. Start with a concrete target: which account needs review, which item belongs in a candidate set, which molecule has a desired property, or which documents support a question. Identify what information is available at that moment. A graph is not automatically the right representation because entities can be connected. Ask whether the links add predictive signal beyond a strong tabular, lexical or text-embedding baseline. The examples here are research designs and authored teaching fixtures, not claims about employer systems."
+        ],
+        [
+          "02 / Three ideas that should stay separate",
+          "A graph database stores and queries relationships. A graph neural network learns a representation through the graph. Graph-augmented retrieval uses connections to find or organize evidence for an answer. These can be combined, but none implies the others. A deterministic traversal can support an LLM without training a GNN. A GNN can predict a molecular property without any language model. This distinction makes the architecture easier to justify and the evaluation easier to interpret.",
+          [
+            [
+              "G-Retriever · textual graph understanding and question answering",
+              "https://arxiv.org/abs/2402.07630"
+            ],
+            [
+              "Graph Evidence Lab · independently authored implementation",
+              "https://github.com/jorgeutd/graph-evidence-lab"
+            ]
+          ]
+        ],
+        [
+          "03 / The computation: send, aggregate, update",
+          "Represent a graph as nodes, edges, node features and optional edge features. At layer l, each neighbor sends a message computed from its state, the receiving state and the connecting edge. A permutation-invariant aggregator combines incoming messages; an update function produces the next node state. After two local propagation layers, a node can depend on information two hops away. A node-level readout predicts a label or ranking score; a graph-level task pools node states before its readout. The 3D lab exposes this computation with four-channel vectors, exact coefficients and fixed matrices. Its spatial coordinates are a layout, not learned embeddings.",
+          [
+            [
+              "MPNN · Neural Message Passing for Quantum Chemistry",
+              "https://arxiv.org/abs/1704.01212"
+            ]
+          ]
+        ],
+        [
+          "04 / Choose the operator for a reason",
+          "GCN adds self loops and uses symmetric degree normalization: each incoming transformed feature is weighted by 1 / sqrt(receiver degree × sender degree). These coefficients need not sum to one. Mean GraphSAGE separates a node’s own representation from an aggregated neighborhood; sampling can bound work on large graphs. GATv2 computes attention from the receiving and sending features so the receiving node can affect neighbor ranking. Its normalized coefficients sum to one within the neighborhood. Attention is a description of a computation, not proof of causal importance. Heterogeneous graphs need relation semantics; geometric tasks may need invariant or equivariant operations. The most elaborate operator is not necessarily the best one.",
+          [
+            [
+              "GCN · Semi-Supervised Classification with Graph Convolutional Networks",
+              "https://arxiv.org/abs/1609.02907"
+            ],
+            [
+              "GraphSAGE · Inductive Representation Learning on Large Graphs",
+              "https://arxiv.org/abs/1706.02216"
+            ],
+            [
+              "GATv2 · How Attentive are Graph Attention Networks?",
+              "https://arxiv.org/abs/2105.14491"
+            ]
+          ]
+        ],
+        [
+          "05 / Design the graph before training it",
+          "Specify identity, edge direction, relation type, confidence, provenance and availability time. A “requires” link differs from a “measures” link; connected nodes may have complementary roles rather than matching labels. Decide how to handle isolated nodes, duplicated events and uncertain extracted relationships. Add reverse edges only after applying time cutoffs, or future evidence may flow backward into a prediction. For a live system, record both event time and the time information became available. Inspect whether a target label, a post-outcome relation or an entity identifier leaks the answer. A complicated network cannot rescue an invalid information boundary."
+        ],
+        [
+          "06 / Four useful application patterns",
+          "Fraud detection connects accounts, devices and transactions; useful evaluation includes precision–recall behavior, recall at review capacity, calibration and future-period stability. Recommendations connect users, items and interactions; candidate construction, exposure bias and cold-start slices matter as much as the chosen ranking metric. Molecules connect atoms and bonds, often with geometry; scaffold or material-family splits test a different ability from random splits. Technical retrieval connects documents, concepts and citations; measure whether graph evidence improves retrieval and the final answer under a fixed context budget. These are starting points for experiment design, not interchangeable benchmarks.",
+          [
+            [
+              "MPNN · Neural Message Passing for Quantum Chemistry",
+              "https://arxiv.org/abs/1704.01212"
+            ],
+            [
+              "ALIGNN 2.0 · materials-oriented graph learning",
+              "https://arxiv.org/abs/2609.19487"
+            ],
+            [
+              "G-Retriever · textual graph understanding and question answering",
+              "https://arxiv.org/abs/2402.07630"
+            ]
+          ]
+        ],
+        [
+          "07 / How graphs and LLMs can work together",
+          "There are several integration points. A language encoder can supply text features for graph nodes. A graph can retrieve a compact evidence set that is serialized into an LLM’s context. A learned graph representation can also condition a language model through an adapter or soft prompt. G-Retriever is a useful foundation for the last two ideas: it combines subgraph retrieval and graph-conditioned generation for textual graph question answering, with an available implementation. Reproducing that system requires its retrieval and language-model training setup. Passing retrieved text to an LLM is a simpler, separate design.",
+          [
+            [
+              "G-Retriever · textual graph understanding and question answering",
+              "https://arxiv.org/abs/2402.07630"
+            ],
+            [
+              "G-Retriever · original implementation",
+              "https://github.com/XiaoxinHe/G-Retriever"
+            ]
+          ]
+        ],
+        [
+          "08 / A project that tests the retrieval decision",
+          "Graph Evidence Lab is my independently authored implementation of query-conditioned relational message passing. It combines deterministic text features, query interactions and a lexical score, then applies two 32-channel graph updates and a document readout. Relation-specific channel gates distinguish edge types; confidence weights the neighbor aggregate. A local FastAPI service returns ranked sources, timing and provenance, or a bounded context packet for an external LLM. No hosted model is called. The project deliberately includes BM25, graph diffusion and a retrained feature-only neural baseline. Its custom MPNN is not a reproduction of G-Retriever or of the fixed-weight browser operators.",
+          [
+            [
+              "Graph Evidence Lab · independently authored implementation",
+              "https://github.com/jorgeutd/graph-evidence-lab"
+            ]
+          ]
+        ],
+        [
+          "09 / Start small, keep the comparison fair",
+          "Clone the repository, install the CPU runtime, run the tests, and execute the benchmark command. The original fixture contains 37 documents, 48 typed edges and 44 queries; one future document is intentionally unavailable at the evaluation cutoff. Twenty-four training queries belong to 12 groups, followed by eight validation and twelve test queries in distinct groups. Checkpoints are selected on validation NDCG@5; test judgments never construct edges or choose a checkpoint. The graph is known across splits. This evaluates held-out question intents on one authored corpus, not unseen graphs, temporal forecasting or general production capability. Replace the fixture with an authorized, independently judged corpus before drawing a stronger conclusion.",
+          [
+            [
+              "Graph Evidence Lab · independently authored implementation",
+              "https://github.com/jorgeutd/graph-evidence-lab"
+            ]
+          ]
+        ],
+        [
+          "10 / Measure retrieval and answers separately",
+          "Track Recall@k to identify missing evidence, NDCG@k for graded ordering, and MRR@k for the first useful item. Record the candidate set and judgment policy. If an LLM consumes the evidence, add grounded answer quality, abstention and claim-to-source support checks. Citation identifier membership alone cannot establish entailment. Keep retrieval and reader failures separate in traces. Compare accuracy, latency and context cost against simpler methods, report multiple seeds, and inspect per-query outcomes. A bootstrap over twelve authored test questions describes sensitivity to those questions; it does not manufacture an external benchmark or a production guarantee. In the first measured project run, BM25 reached 0.811 NDCG@5, graph diffusion 0.815, and the trained GNN averaged 0.776 across three seeds. The simpler baselines lead on this metric. I retain that outcome and all twelve query results rather than changing the fixture to favor the neural model.",
+          [
+            [
+              "Measured report and protocol",
+              "https://github.com/jorgeutd/graph-evidence-lab/blob/4d58cac740c55bd611f21b6511ce7c53cb779128/docs/evaluation.md"
+            ]
+          ]
+        ],
+        [
+          "11 / Read this first: a practical foundation",
+          "G-Retriever (NeurIPS 2024) is my starting recommendation for textual graph question answering because it connects graph retrieval to a concrete language-model workflow and provides code. Read it alongside the MPNN formulation, GraphSAGE and GATv2 to understand the mechanics. For application work, begin with the smallest baseline that can answer the question. The newest paper is useful when its assumptions match your data, not simply because its date is recent.",
+          [
+            [
+              "G-Retriever · textual graph understanding and question answering",
+              "https://arxiv.org/abs/2402.07630"
+            ],
+            [
+              "G-Retriever · original implementation",
+              "https://github.com/XiaoxinHe/G-Retriever"
+            ],
+            [
+              "MPNN · Neural Message Passing for Quantum Chemistry",
+              "https://arxiv.org/abs/1704.01212"
+            ]
+          ]
+        ],
+        [
+          "12 / Recent research: useful directions, scoped claims",
+          "NGM-RAG (July 2026 preprint) combines neural graph matching with other retrieval signals; its reported gains are tied to the evaluated tasks, and this review did not verify a public implementation. Chimaera (September 2026) combines GNN experts over language representations with learned selection. The full paper is accessible, but its linked code repository returned 404 during this review. ALIGNN 2.0 (September 2026 preprint) is a different, application-specific direction: atom/bond and line-graph structure for materials. These papers motivate experiments; they do not establish one universally best GNN.",
+          [
+            [
+              "NGM-RAG · neural graph matching for retrieval",
+              "https://arxiv.org/abs/2607.11159"
+            ],
+            [
+              "Chimaera · graph experts and language representations",
+              "https://arxiv.org/abs/2609.08709"
+            ],
+            [
+              "ALIGNN 2.0 · materials-oriented graph learning",
+              "https://arxiv.org/abs/2609.19487"
+            ]
+          ]
+        ],
+        [
+          "13 / The recent paper that keeps the comparison honest",
+          "Knowledge-Graph Based Augmentation versus RAG for Cultural QA (September 2026 preprint) directly compares graph-based and conventional retrieval. Its graph context can be compact, while conventional RAG remains competitive and is stronger in some evaluated settings. The study uses a narrow multiple-choice cultural QA setup, one reader model and benchmark-specific adaptation, so its findings should not be generalized to all knowledge work. My takeaway is an experiment design principle: measure what the graph preserves, what extraction loses, and whether a simpler retrieval method answers the question better under the same budget.",
+          [
+            [
+              "Knowledge-Graph Based Augmentation versus RAG for Cultural QA",
+              "https://arxiv.org/abs/2609.18317"
+            ]
+          ]
+        ],
+        [
+          "14 / What I would build next",
+          "The next useful step is an external, versioned corpus with independently judged questions. Replace hashed features with a pinned text encoder; compare a tuned dense retriever and cross-encoder; stress-test missing, corrupted and misleading edges. Evaluate new documents and time cutoffs separately. Add sampled neighborhoods only when measured graph size requires them. Then connect a reader and assess end-to-end grounding, latency and cost. Keep the numerical replay, dataset revision, model checkpoint and evaluation report together so someone else can inspect both the successful examples and the failures.",
+          [
+            [
+              "Graph Evidence Lab · independently authored implementation",
+              "https://github.com/jorgeutd/graph-evidence-lab"
+            ]
+          ]
+        ]
+      ],
+      "sources": [
+        [
+          "MPNN · Neural Message Passing for Quantum Chemistry",
+          "https://arxiv.org/abs/1704.01212"
+        ],
+        [
+          "GCN · Semi-Supervised Classification with Graph Convolutional Networks",
+          "https://arxiv.org/abs/1609.02907"
+        ],
+        [
+          "GraphSAGE · Inductive Representation Learning on Large Graphs",
+          "https://arxiv.org/abs/1706.02216"
+        ],
+        [
+          "GATv2 · How Attentive are Graph Attention Networks?",
+          "https://arxiv.org/abs/2105.14491"
+        ],
+        [
+          "G-Retriever · textual graph understanding and question answering",
+          "https://arxiv.org/abs/2402.07630"
+        ],
+        [
+          "G-Retriever · original implementation",
+          "https://github.com/XiaoxinHe/G-Retriever"
+        ],
+        [
+          "NGM-RAG · neural graph matching for retrieval",
+          "https://arxiv.org/abs/2607.11159"
+        ],
+        [
+          "Chimaera · graph experts and language representations",
+          "https://arxiv.org/abs/2609.08709"
+        ],
+        [
+          "Knowledge-Graph Based Augmentation versus RAG for Cultural QA",
+          "https://arxiv.org/abs/2609.18317"
+        ],
+        [
+          "ALIGNN 2.0 · materials-oriented graph learning",
+          "https://arxiv.org/abs/2609.19487"
+        ],
+        [
+          "Graph Evidence Lab · independently authored implementation",
+          "https://github.com/jorgeutd/graph-evidence-lab"
+        ]
+      ],
+      "sourceNote": "Original engineering research guide by Jorge Grisman, informed by primary papers and a separately authored implementation. This is a portfolio explainer, not a peer-reviewed publication. Recent preprints are identified as such. Paper results are author-reported unless explicitly marked as a measured project run. Literature and code availability were reviewed on 18 September 2026; the selection is not an exhaustive ranking of the field."
+    },
     {
       "slug": "agent-evaluation",
       "category": "Agent evaluation",
@@ -546,6 +771,70 @@ window.PORTFOLIO_CONTENT = {
     }
   ],
   "papers": [
+    [
+      "Graphs",
+      "G-Retriever",
+      "NeurIPS 2024",
+      "A practical foundation for textual graph QA: retrieve a subgraph and connect it to a language model. Original code is available.",
+      "https://arxiv.org/abs/2402.07630",
+      "graph-neural-networks"
+    ],
+    [
+      "Graphs",
+      "Graph augmentation versus RAG for Cultural QA",
+      "Sep 2026 · preprint",
+      "A recent comparison that makes compact graph context, retrieval quality and benchmark assumptions visible.",
+      "https://arxiv.org/abs/2609.18317",
+      "graph-neural-networks"
+    ],
+    [
+      "Graphs",
+      "Chimaera",
+      "Sep 2026",
+      "Graph experts over language representations with learned selection. Full paper reviewed; linked code was inaccessible during this review.",
+      "https://arxiv.org/abs/2609.08709",
+      "graph-neural-networks"
+    ],
+    [
+      "Graphs",
+      "NGM-RAG",
+      "Jul 2026 · preprint",
+      "Neural graph matching for retrieval. A direction to evaluate against tuned lexical and dense baselines.",
+      "https://arxiv.org/abs/2607.11159",
+      "graph-neural-networks"
+    ],
+    [
+      "Graphs",
+      "ALIGNN 2.0",
+      "Sep 2026 · preprint",
+      "Materials-oriented atom/bond and line-graph learning. An example of matching the architecture to physical structure.",
+      "https://arxiv.org/abs/2609.19487",
+      "graph-neural-networks"
+    ],
+    [
+      "Graphs",
+      "Neural Message Passing",
+      "ICML 2017",
+      "A common language for messages, aggregation, updates and graph readouts.",
+      "https://arxiv.org/abs/1704.01212",
+      "graph-neural-networks"
+    ],
+    [
+      "Graphs",
+      "GraphSAGE",
+      "NeurIPS 2017",
+      "Inductive neighborhood aggregation and sampling for large graphs.",
+      "https://arxiv.org/abs/1706.02216",
+      "graph-neural-networks"
+    ],
+    [
+      "Graphs",
+      "How Attentive are Graph Attention Networks?",
+      "ICLR 2022",
+      "The expressivity limitation of static attention and the GATv2 update.",
+      "https://arxiv.org/abs/2105.14491",
+      "graph-neural-networks"
+    ],
     [
       "Agents",
       "Mo’ Models, Mo’ Problems: How to best select model pools when designing Multi-Agent Systems",
