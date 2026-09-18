@@ -9,6 +9,10 @@ test('reserved encoders have an opportunity cost for pure text',()=>{
  const r=M.inference({count:2,gpus:2,media:0,tokens:10,gap:0});
  expect(r.aggregated.rows.map(x=>x.end)).toEqual([28,28]);expect(r.separated.rows.map(x=>x.end)).toEqual([28,56]);
 });
+test('isolating a media burst protects text latency while delaying overall completion',()=>{
+ const r=M.inference();expect(r.separated.p95Text).toBeLessThanOrEqual(r.aggregated.p95Text);expect(r.separated.p95End).toBeGreaterThanOrEqual(r.aggregated.p95End);
+ expect(M.inference({media:100}).aggregated.p95Text).toBeNull();
+});
 test('work conservation, causal order and capacity hold across workload extremes',()=>{
  for(const media of [0,50,100])for(const gpus of [2,4,8])for(const encoders of [1,gpus-1])for(const tokens of [32,2048])for(const gap of [0,1000]){
   const r=M.inference({media,gpus,encoders,tokens,gap});

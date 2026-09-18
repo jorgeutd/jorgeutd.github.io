@@ -1,7 +1,7 @@
 /* Original deterministic teaching models. No measured hardware or real services. */
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.SystemsTeaching=api;})(typeof window!=='undefined'?window:globalThis,()=>{
  'use strict';
- const defaults={count:32,gpus:4,encoders:1,media:50,images:6,tokens:128,gap:80,transfer:16,acceleration:1,slo:1000};
+ const defaults={count:32,gpus:4,encoders:1,media:50,images:12,tokens:32,gap:40,transfer:16,acceleration:1,slo:1000,order:'media-first'};
  const percentile=(xs,p)=>[...xs].sort((a,b)=>a-b)[Math.max(0,Math.ceil(xs.length*p)-1)];
  function inference(options={}){
   const c={...defaults,...options};
@@ -11,7 +11,7 @@
   if(c.media>100||c.acceleration===0||c.slo===0)throw Error('Invalid workload');
   const requests=Array.from({length:c.count},(_,i)=>{
    // Evenly distribute a deterministic media fraction; the fixture never changes randomly.
-   const media=Math.floor((i+1)*c.media/100)>Math.floor(i*c.media/100);
+   const media=c.order==='media-first'?i<Math.floor(c.count*c.media/100):Math.floor((i+1)*c.media/100)>Math.floor(i*c.media/100);
    return {id:i,arrival:i*c.gap,media,encode:media?c.images*25:0,prefill:(12+(media?c.images*5:0))/c.acceleration,decode:c.tokens*1.6/c.acceleration};
   });
   const reserve=(pool,ready,duration)=>{const worker=pool.indexOf(Math.min(...pool)),start=Math.max(ready,pool[worker]);pool[worker]=start+duration;return {worker,start,end:start+duration};};
@@ -32,7 +32,7 @@
    const s=reserve(pd,r.ready,r.prefill+r.decode);
    return finish(r,[...r.spans,span('LLM queue',r.ready,s.start,'LLM pool'),span('Prefill',s.start,s.start+r.prefill,'LLM '+s.worker),span('Decode',s.start+r.prefill,s.end,'LLM '+s.worker)],s.start+r.prefill+1.6/c.acceleration,s.end);
   }).sort((a,b)=>a.id-b.id);
-  function summary(rows){const horizon=Math.max(...rows.map(r=>r.end)),passed=rows.filter(r=>r.latency<=c.slo).length;return {rows,p95First:percentile(rows.map(r=>r.ttft),.95),p95End:percentile(rows.map(r=>r.latency),.95),passed,goodput:passed/(horizon/1000),horizon};}
+  function summary(rows){const horizon=Math.max(...rows.map(r=>r.end)),passed=rows.filter(r=>r.latency<=c.slo).length,text=rows.filter(r=>!r.media);return {rows,p95First:percentile(rows.map(r=>r.ttft),.95),p95Text:text.length?percentile(text.map(r=>r.ttft),.95):null,p95End:percentile(rows.map(r=>r.latency),.95),passed,goodput:passed/(horizon/1000),horizon};}
   return {config:c,requests,aggregated:summary(aggregated),separated:summary(separated)};
  }
  function recovery(idempotent=true){
