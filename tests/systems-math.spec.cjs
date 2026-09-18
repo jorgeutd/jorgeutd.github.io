@@ -1,4 +1,5 @@
 const {test,expect}=require('@playwright/test');
+const assert=require('node:assert/strict');
 const M=require('../assets/portfolio-systems-math');
 test('one request has an independently calculated latency and transfer cost',()=>{
  const r=M.inference({count:1,gpus:2,media:100,images:2,tokens:10,transfer:16});
@@ -17,13 +18,13 @@ test('work conservation, causal order and capacity hold across workload extremes
  for(const media of [0,50,100])for(const gpus of [2,4,8])for(const encoders of [1,gpus-1])for(const tokens of [32,2048])for(const gap of [0,1000]){
   const r=M.inference({media,gpus,encoders,tokens,gap});
   for(const layout of [r.aggregated,r.separated]){
-   expect(layout.rows.length).toBe(32);expect(layout.passed).toBeLessThanOrEqual(32);
+   assert.equal(layout.rows.length,32);assert.ok(layout.passed<=32);
    const resources={};
    for(const row of layout.rows){
-    expect(row.first).toBeLessThanOrEqual(row.end);expect(row.latency).toBeCloseTo(row.spans.reduce((n,s)=>n+s.end-s.start,0));
-    let time=row.arrival;for(const s of row.spans){expect(s.start).toBeCloseTo(time);expect(s.end).toBeGreaterThanOrEqual(s.start);time=s.end;if(['Encode','Prefill','Decode'].includes(s.name)&&s.end>s.start)(resources[s.worker]??=[]).push(s);}
+    assert.ok(row.first<=row.end);assert.ok(Math.abs(row.latency-row.spans.reduce((n,s)=>n+s.end-s.start,0))<1e-8);
+    let time=row.arrival;for(const s of row.spans){assert.ok(Math.abs(s.start-time)<1e-8);assert.ok(s.end>=s.start);time=s.end;if(['Encode','Prefill','Decode'].includes(s.name)&&s.end>s.start)(resources[s.worker]??=[]).push(s);}
    }
-   for(const spans of Object.values(resources)){spans.sort((a,b)=>a.start-b.start);for(let i=1;i<spans.length;i++)expect(spans[i].start+1e-8).toBeGreaterThanOrEqual(spans[i-1].end);}
+   for(const spans of Object.values(resources)){spans.sort((a,b)=>a.start-b.start);for(let i=1;i<spans.length;i++)assert.ok(spans[i].start+1e-8>=spans[i-1].end);}
   }
  }
 });
