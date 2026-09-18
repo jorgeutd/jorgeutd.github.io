@@ -5,7 +5,7 @@
  const link=(text,url)=>`<a class="text-link" href="${url}">${text}</a>`;
  let dispose=()=>{};
  const methods={gcn:['GCN','Degree-normalized neighbors + self','h′ᵢ = ReLU(Σⱼ W hⱼ / √(d̃ᵢ d̃ⱼ))'],sage:['GraphSAGE · mean','Separate self path + neighbor mean','h′ᵢ = ReLU(S hᵢ + meanⱼ∈N(i)(W hⱼ))'],gatv2:['GATv2 · one head','Query-dependent attention + self','αᵢⱼ = softmaxⱼ(aᵀ LeakyReLU(Qhᵢ + Khⱼ))']};
- function vector(title,values){return `<div class="graph-vector"><span>${title}</span><div>${values.map((v,i)=>`<div><i style="width:${Math.min(100,Math.abs(v)*100)}%"></i><b>${v.toFixed(4)}</b><small>channel ${i+1}</small></div>`).join('')}</div>`;}
+ function vector(title,values){return `<div class="graph-vector"><span>${title}</span><div>${values.map((v,i)=>`<div><i style="width:${Math.min(100,Math.abs(v)*100)}%"></i><b>${v.toFixed(4)}</b><small>channel ${i+1}</small></div>`).join('')}</div></div>`;}
  function miniArt(){return `<svg viewBox="0 0 400 210" aria-hidden="true"><g fill="none" stroke="currentColor">${M.edges.map(([a,b])=>{const p=M.nodes[a].p,q=M.nodes[b].p;return `<path d="M${p[0]*.6+190} ${p[1]*.5+100}L${q[0]*.6+190} ${q[1]*.5+100}" opacity=".35"/>`;}).join('')}${M.nodes.map((n,i)=>`<circle cx="${n.p[0]*.6+190}" cy="${n.p[1]*.5+100}" r="${i===3?17:8}" fill="${i===3?'currentColor':'var(--paper)'}"/><circle cx="${n.p[0]*.6+190}" cy="${n.p[1]*.5+100}" r="${i===3?25:13}" opacity=".18"/>`).join('')}</g><text x="20" y="200" fill="currentColor" font-size="10" font-family="monospace">FEATURES → MESSAGES → EVIDENCE</text></svg>`;}
  function mount(root){
   let selected=3,method='gcn',layer=1,cut=false,flat=false,stack=false,yaw=-.2,pitch=.22,zoom=1,playing=false,frame=0,phase=0,lastTime=0,points=[],closed=false,replay=null;
@@ -32,7 +32,7 @@
    ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
    const style=getComputedStyle(lab),ink=style.getPropertyValue('--ink').trim()||'#222820',muted=style.getPropertyValue('--muted').trim()||'#647067',accent=style.getPropertyValue('--accent').trim()||'#355b45',paper=style.getPropertyValue('--paper').trim()||'#fff',line=style.getPropertyValue('--line').trim()||'#dbe0d8';
    const computed=M.run(method,cut),reachable=M.reach(selected,computed.links,layer);
-   const project=(p,l=layer)=>{let [x,y,z]=p;if(stack){x=x*.52+(l-1.5)*175;y*=.67;z=z*.5;}if(flat)z=0;else{const a=x*Math.cos(yaw)-z*Math.sin(yaw),b=x*Math.sin(yaw)+z*Math.cos(yaw);x=a;z=b;const c=y*Math.cos(pitch)-z*Math.sin(pitch);z=y*Math.sin(pitch)+z*Math.cos(pitch);y=c;}const perspective=flat?1:850/(850+z),scale=Math.min(w/(stack?920:630),h/420)*zoom;return {x:w/2+x*perspective*scale,y:h*.53+y*perspective*scale,z,r:perspective*scale};};
+   const project=(p,l=layer)=>{let [x,y,z]=p;if(stack){x=x*.52+(l-1.5)*175;y*=.67;z=z*.5;}if(flat)z=0;else{const a=x*Math.cos(yaw)-z*Math.sin(yaw),b=x*Math.sin(yaw)+z*Math.cos(yaw);x=a;z=b;const c=y*Math.cos(pitch)-z*Math.sin(pitch);z=y*Math.sin(pitch)+z*Math.cos(pitch);y=c;}const perspective=flat?1:850/(850+z),scale=Math.min(w/(stack?920:630),(h-75)/420)*zoom;return {x:w/2+x*perspective*scale,y:h*.51+y*perspective*scale,z,r:perspective*scale};};
    // Perspective floor gives depth without implying a learned embedding space.
    ctx.lineWidth=.65;ctx.strokeStyle=line;ctx.globalAlpha=.6;
    for(let x=-280;x<=280;x+=40){const a=project([x,195,-160]),b=project([x,195,160]);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}
