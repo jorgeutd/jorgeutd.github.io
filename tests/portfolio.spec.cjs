@@ -92,7 +92,7 @@ test('model-pool experiment preserves outcome counts and handles no recoverable 
 });
 
 test('new papers and research guides are linked and readable without JavaScript',async({page,browser},info)=>{
- await page.goto('/#notes');await expect(page.locator('#paper-count')).toHaveText('29 references');await page.locator('[data-paper-filter="Agents"]').click();await expect(page.locator('#paper-shelf .paper-item')).toHaveCount(4);
+ await page.goto('/#notes');await expect(page.locator('#paper-count')).toHaveText('31 references');await page.locator('[data-paper-filter="Agents"]').click();await expect(page.locator('#paper-shelf .paper-item')).toHaveCount(4);
  await expect(page.locator('#paper-shelf a[href="https://arxiv.org/abs/2609.17306"]')).toBeVisible();await page.locator('#paper-shelf .paper-item').first().getByRole('link',{name:'Related explainer'}).click();await expect(page.locator('#view-notes h1')).toContainText('A better answer');
  await page.goto('/notes/encoder-decoder/');await expect(page.locator('#view-notes .architecture-explorer')).toBeVisible();await noOverflow(page);await shot(page,info,'encoder-decoder-full');
  const context=await browser.newContext({javaScriptEnabled:false,baseURL:test.info().project.use.baseURL||'http://127.0.0.1:4173'}),plain=await context.newPage();

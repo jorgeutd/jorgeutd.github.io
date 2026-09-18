@@ -23,6 +23,7 @@ dialog{background:var(--paper);color:var(--ink);border:1px solid var(--line);bor
 <link rel="stylesheet" href="assets/portfolio-research.css?v=bb73ab80d1"><link rel="stylesheet" href="assets/portfolio-transformer.css?v=9e545ef873">
 <link rel="stylesheet" href="assets/portfolio-delivery.css?v=1a1dbfa885">
 <link rel="stylesheet" href="assets/portfolio-graphs.css?v=fa813df4dd">
+<link rel="stylesheet" href="assets/portfolio-systems.css?v=4e0e6fe93a">
 <meta name="description" content="Explore weight and KV-cache payload under explicit architectural assumptions.">
 <meta name="author" content="Jorge Grisman">
 <meta name="theme-color" content="#fafbf8">
@@ -236,12 +237,14 @@ function setTheme(theme){document.documentElement.dataset.theme=theme;$('theme-t
 $('theme-toggle').addEventListener('click',()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));try{setTheme(localStorage.getItem('portfolio-concept-theme')||'light');}catch{}
 updateMemory();navigate();
 </script>
-<script src="assets/portfolio-content.js?v=e45c630b80"></script>
+<script src="assets/portfolio-content.js?v=bb6d03f202"></script>
 <script src="assets/portfolio-atlas.js?v=670810bb65"></script><script src="assets/portfolio-research.js?v=5dc6865532"></script>
 <script src="assets/portfolio-transformer.js?v=9527a3ddc9"></script>
-<script src="assets/portfolio-expansion.js?v=a5f3fc6b5f"></script>
+<script src="assets/portfolio-expansion.js?v=04d294dc88"></script>
 <script src="assets/portfolio-delivery.js?v=de77372976"></script>
 <script src="assets/portfolio-graph-math.js?v=29d8cc1fba"></script>
 <script src="assets/portfolio-graphs.js?v=02aa2a23cb"></script>
+<script src="assets/portfolio-systems-math.js?v=23f1799379"></script>
+<script src="assets/portfolio-systems.js?v=33a705b78b"></script>
 
 </body></html>

@@ -16,6 +16,12 @@
       "alt": "Measure the outcome. Then explain the trajectory. — models, mechanisms and systems. Jorge Grisman."
     },
     {
+      "route": "/notes/agent-recovery/",
+      "title": "Keep the outcome when a worker fails.",
+      "asset": "assets/social/notes-agent-recovery-454696c0df.png",
+      "alt": "Keep the outcome when a worker fails. — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
       "route": "/notes/encoder-decoder/",
       "title": "Encoder, decoder, or both? Start with the output.",
       "asset": "assets/social/notes-encoder-decoder-43ac7da641.png",
@@ -38,6 +44,12 @@
       "title": "The cache is part of the architecture.",
       "asset": "assets/social/notes-inference-b77f231027.png",
       "alt": "The cache is part of the architecture. — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
+      "route": "/notes/inference-topology/",
+      "title": "Make inference capacity earn its cost.",
+      "asset": "assets/social/notes-inference-topology-8d84d59794.png",
+      "alt": "Make inference capacity earn its cost. — models, mechanisms and systems. Jorge Grisman."
     },
     {
       "route": "/notes/model-mechanics/",
@@ -70,6 +82,12 @@
       "alt": "A trace should explain the execution. — models, mechanisms and systems. Jorge Grisman."
     },
     {
+      "route": "/labs/agent-recovery/",
+      "title": "Agent recovery",
+      "asset": "assets/social/labs-agent-recovery-a1594893b2.png",
+      "alt": "Agent recovery — models, mechanisms and systems. Jorge Grisman."
+    },
+    {
       "route": "/labs/architecture/",
       "title": "System design atlas",
       "asset": "assets/social/labs-architecture-235c61a9d4.png",
@@ -92,6 +110,12 @@
       "title": "Graph neural networks",
       "asset": "assets/social/labs-graphs-641e2af102.png",
       "alt": "Graph neural networks — connected evidence and message passing. Jorge Grisman."
+    },
+    {
+      "route": "/labs/inference-topology/",
+      "title": "Inference topology",
+      "asset": "assets/social/labs-inference-topology-341fffb44e.png",
+      "alt": "Inference topology — models, mechanisms and systems. Jorge Grisman."
     },
     {
       "route": "/labs/memory/",

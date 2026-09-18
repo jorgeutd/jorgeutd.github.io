@@ -18,7 +18,8 @@ Open `http://127.0.0.1:4173`. Run the desktop and mobile browser checks with `np
 ## Public content
 
 - The homepage has sections for selected work, research, notes, general interactive labs, open models, and experience.
-- Six articles also have standalone `/notes/<topic>/` URLs with readable initial HTML and individual metadata.
+- Twelve articles also have standalone `/notes/<topic>/` URLs with readable initial HTML and individual metadata.
+- Two compact 2026 engineering notes connect inference architecture and agent recovery to practical delivery decisions. Their optional `/labs/inference-topology/` and `/labs/agent-recovery/` examples use original, deterministic teaching models. All timings are simulated; no hardware measurements or external tool calls are implied.
 - Browser labs cover cache memory, scheduling, sampling, evaluation, synthetic traces, and an interactive system-design atlas.
 - The atlas contains four original reference architectures: a FastAPI application, inference serving, on-device inference, and a quantization pipeline. Each has component inspection, execution playback, failure scenarios, trace links, flow filters, zoom, and an SVG download. Device and quantization studies include separate weight and KV payload calculations.
 - Professional work is described at a high level. Employer applications, internal project demos, and employer-derived diagrams are excluded.
