@@ -1,5 +1,39 @@
 /* Public model references and original engineering explainers. */
 window.PORTFOLIO_CONTENT = {
+  "recognition": [
+    {
+      "id": "aws-sagemaker-training-compiler",
+      "outlet": "AWS News Blog · AWS re:Invent Launch",
+      "date": "1 Dec 2021",
+      "author": "Sean M. Tracey · AWS",
+      "organization": "Quantum Health",
+      "role": "Jorge Lopez Grisman · Senior Data Scientist, Quantum Health",
+      "title": "New – Introducing SageMaker Training Compiler",
+      "context": "Featured customer perspective in AWS’s re:Invent launch announcement for Amazon SageMaker Training Compiler (and the accompanying Amazon press release), highlighting graph- and kernel-level compiler optimizations that accelerated deep learning training by up to 50% and cut RoBERTa-base fine-tuning time and cost by 30%.",
+      "quote": "Iterating with NLP models can be a challenge because of their size: long training times bog down workflows and high costs can discourage our team from trying larger models that might offer better performance. Amazon SageMaker Training Compiler is exciting because it has the potential to alleviate these frictions. Achieving a speedup with SageMaker Training Compiler is a real win for our team that will make us more agile and innovative moving forward.",
+      "url": "https://aws.amazon.com/blogs/aws/new-introducing-sagemaker-training-compiler/",
+      "primaryLabel": "Read AWS News Blog ↗",
+      "secondaryUrl": "https://press.aboutamazon.com/2021/12/aws-announces-six-new-amazon-sagemaker-capabilities",
+      "secondaryLabel": "AWS re:Invent press release ↗",
+      "tags": ["Amazon SageMaker", "Training Compiler", "RoBERTa / NLP", "Quantum Health"]
+    },
+    {
+      "id": "aws-huggingface-collaboration",
+      "outlet": "AWS Machine Learning Blog & AWS Startups Blog",
+      "date": "23 Mar 2021",
+      "author": "Julien Simon · AWS",
+      "organization": "Quantum Health",
+      "role": "Jorge Grisman · NLP Data Scientist, Quantum Health",
+      "title": "AWS and Hugging Face collaborate to simplify and accelerate adoption of Natural Language Processing models",
+      "context": "Featured launch customer in the official AWS and Hugging Face partnership announcement introducing the HuggingFace SageMaker estimator, Deep Learning Containers, and distributed data-parallel training for healthcare text classification, summarization, and question answering.",
+      "quote": "We use Hugging Face and Amazon SageMaker a lot for many NLP use cases such as text classification, text summarization, and Q&A with the goal of helping our agents and members. For some use cases, we just use the Hugging Face models directly and for others we fine tune them on SageMaker. We are excited about the integration of Hugging Face Transformers into Amazon SageMaker to make use of the distributed libraries during training to shorten the training time for our larger datasets.",
+      "url": "https://aws.amazon.com/blogs/machine-learning/aws-and-hugging-face-collaborate-to-simplify-and-accelerate-adoption-of-natural-language-processing-models/",
+      "primaryLabel": "Read AWS ML Blog ↗",
+      "secondaryUrl": "https://aws.amazon.com/blogs/startups/hugging-face-and-aws-democratizing-natural-language-processing-for-businesses-and-developers-worldwide/",
+      "secondaryLabel": "AWS Startups feature ↗",
+      "tags": ["Hugging Face", "Amazon SageMaker", "Distributed training", "Quantum Health"]
+    }
+  ],
   "models": [
     {
       "id": "bert-base-uncased-ade-Ade-corpus-v2",
