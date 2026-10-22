@@ -2,7 +2,7 @@ const {test,expect}=require('@playwright/test');
 const fs=require('node:fs'),path=require('node:path');
 const forbidden=/s3:\/\/|C:\\\\Users\\\\|x-amz-credential/i;
 const screenshots=path.resolve('screenshots');fs.mkdirSync(screenshots,{recursive:true});
-async function shot(page,testInfo,name){const fullPage=name==='home'||name.includes('full')||name.startsWith('atlas-');if(fullPage)await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:path.join(screenshots,testInfo.project.name+'-'+name+'.png'),fullPage});}
+async function shot(page,testInfo,name){const fullPage=name==='home'||name.includes('full')||name.startsWith('atlas-')||name==='aws-recognition';if(fullPage)await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:path.join(screenshots,testInfo.project.name+'-'+name+'.png'),fullPage});}
 async function setRange(page,selector,value){await page.locator(selector).evaluate((node,v)=>{node.value=v;node.dispatchEvent(new Event('input',{bubbles:true}));},String(value));}
 async function noOverflow(page){expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy();}
 test('homepage, copyright, public project links and top compatibility',async({page},info)=>{
@@ -130,4 +130,28 @@ test('published assets have no archived project identifiers',async({request})=>{
 });
 test('theme persists across article navigation and page focus has no decorative border',async({page,isMobile},info)=>{
  await page.goto('/');await expect(page.locator('#main')).toHaveCSS('outline-style','none');if(isMobile)await page.locator('#menu-toggle').click();await page.locator('#theme-toggle').click();if(isMobile)await page.locator('#scrim').click({position:{x:page.viewportSize().width-10,y:30}});await expect(page.locator('html')).toHaveAttribute('data-theme','dark');await page.goto('/notes/evaluation/');await expect(page.locator('html')).toHaveAttribute('data-theme','dark');await noOverflow(page);await shot(page,info,'dark-article');
+});
+
+test('AWS and Hugging Face industry recognition from Quantum Health is displayed and searchable',async({page},info)=>{
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('/');
+ const overviewRecognition=page.locator('#view-overview .recognition-section');
+ await expect(overviewRecognition).toBeVisible();
+ await expect(overviewRecognition.locator('.recognition-card')).toHaveCount(2);
+ await expect(overviewRecognition).toContainText('New – Introducing SageMaker Training Compiler');
+ await expect(overviewRecognition).toContainText('AWS and Hugging Face collaborate to simplify and accelerate adoption of Natural Language Processing models');
+ await expect(overviewRecognition).toContainText('Achieving a speedup with SageMaker Training Compiler is a real win for our team');
+ await expect(overviewRecognition).toContainText('shorten the training time for our larger datasets');
+ await expect(overviewRecognition.locator('a[href="https://aws.amazon.com/blogs/aws/new-introducing-sagemaker-training-compiler/"]').first()).toHaveAttribute('rel',/noopener/);
+ await expect(overviewRecognition.locator('a[href="https://aws.amazon.com/blogs/machine-learning/aws-and-hugging-face-collaborate-to-simplify-and-accelerate-adoption-of-natural-language-processing-models/"]').first()).toHaveAttribute('rel',/noopener/);
+ await page.goto('/#about');
+ const aboutRecognition=page.locator('#view-about .recognition-section');
+ await expect(aboutRecognition).toBeVisible();
+ await expect(page.locator('#view-about .timeline-recognition')).toContainText('Amazon SageMaker Training Compiler launch');
+ await noOverflow(page);await shot(page,info,'aws-recognition');
+ await page.keyboard.press('Control+k');
+ await page.locator('#search-input').fill('SageMaker Training Compiler');
+ await expect(page.locator('#search-results')).toContainText('New – Introducing SageMaker Training Compiler');
+ await page.keyboard.press('Escape');
+ expect(errors).toEqual([]);
 });

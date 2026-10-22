@@ -17,7 +17,7 @@ Open `http://127.0.0.1:4173`. Run the desktop and mobile browser checks with `np
 
 ## Public content
 
-- The homepage has sections for selected work, research, notes, general interactive labs, open models, and experience.
+- The homepage has sections for selected work, research, notes, general interactive labs, open models, industry recognition (AWS & Hugging Face launch features from Quantum Health), and experience.
 - Twelve articles also have standalone `/notes/<topic>/` URLs with readable initial HTML and individual metadata.
 - Two compact 2026 engineering notes connect inference architecture and agent recovery to practical delivery decisions. Their optional `/labs/inference-topology/` and `/labs/agent-recovery/` examples use original, deterministic teaching models. All timings are simulated; no hardware measurements or external tool calls are implied.
 - Browser labs cover cache memory, scheduling, sampling, evaluation, synthetic traces, and an interactive system-design atlas.
