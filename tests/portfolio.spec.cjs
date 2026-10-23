@@ -138,7 +138,8 @@ test('AWS and Hugging Face industry recognition from Quantum Health is displayed
  const overviewRecognition=page.locator('#view-overview .recognition-section');
  await expect(overviewRecognition).toBeVisible();
  await expect(overviewRecognition.locator('.recognition-card')).toHaveCount(2);
- await expect(overviewRecognition).toContainText('New – Introducing SageMaker Training Compiler');
+ await expect(overviewRecognition).toContainText('Introducing Amazon SageMaker Training Compiler');
+ await expect(overviewRecognition).not.toContainText('New – Introducing');
  await expect(overviewRecognition).toContainText('AWS and Hugging Face collaborate to simplify and accelerate adoption of Natural Language Processing models');
  await expect(overviewRecognition).toContainText('Achieving a speedup with SageMaker Training Compiler is a real win for our team');
  await expect(overviewRecognition).toContainText('shorten the training time for our larger datasets');
@@ -151,7 +152,7 @@ test('AWS and Hugging Face industry recognition from Quantum Health is displayed
  await noOverflow(page);await shot(page,info,'aws-recognition');
  await page.keyboard.press('Control+k');
  await page.locator('#search-input').fill('SageMaker Training Compiler');
- await expect(page.locator('#search-results')).toContainText('New – Introducing SageMaker Training Compiler');
+ await expect(page.locator('#search-results')).toContainText('Introducing Amazon SageMaker Training Compiler');
  await page.keyboard.press('Escape');
  expect(errors).toEqual([]);
 });

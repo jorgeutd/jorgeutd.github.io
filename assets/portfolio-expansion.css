@@ -20,8 +20,9 @@
 .recognition-context{font-size:13px;color:var(--muted);line-height:1.8;margin:0 0 18px}
 .recognition-quote{margin:0 0 18px;padding:16px 18px;border-left:3px solid var(--accent);background:var(--plot);border-radius:0 6px 6px 0}
 .recognition-quote p{font-size:13px;line-height:1.8;color:var(--ink);margin:0}
-.recognition-quote footer{font:10px/1.6 var(--mono);color:var(--muted);margin-top:11px}
+.recognition-quote footer{font:10px/1.6 var(--mono);color:var(--muted);margin-top:11px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px}
 .recognition-quote footer strong{color:var(--ink);font-weight:550}
+.recognition-quote footer span{color:var(--muted)}
 .recognition-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-bottom:16px}
 .recognition-tags span{border:1px solid var(--line);padding:4px 8px;border-radius:4px;font:9px var(--mono);color:var(--muted)}
 .recognition-links{display:flex;flex-wrap:wrap;gap:8px 18px;border-top:1px solid var(--line);padding-top:14px}
